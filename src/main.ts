@@ -1,6 +1,9 @@
 import './style.css'
 import * as d3 from "d3";
-import { mockContributionData } from './data/mock_contribution_data';
+import { ContributionEntry } from './model/ContributionEntry';
+
+// @ts-ignore
+const hydratedContributionData = contributionData as unknown as ContributionEntry[]
 
 const width = window.innerWidth / 2
 const height = window.innerHeight / 2
@@ -29,17 +32,17 @@ function getHeightEndpoint(val: number) {
   return count * step
 }
 
-const endPoint = getHeightEndpoint(d3.max(mockContributionData.map(d => d.amount))!)
+const endPoint = getHeightEndpoint(d3.max(hydratedContributionData.map(d => d.amount))!)
 
-x.domain(mockContributionData.map(d => d.date.toISOString()))
+x.domain(hydratedContributionData.map(d => d.dateString))
 y.domain([0, endPoint])
 
 svg
   .selectAll('rect')
-  .data(mockContributionData)
+  .data(hydratedContributionData)
   .enter()
   .append('rect')
-  .attr('x', d => x(d.date.toISOString())!)
+  .attr('x', d => x(d.dateString)!)
   .attr('width', 24)
   .attr('y', d => y(d.amount))
   .attr('height', d => height - y(d.amount))

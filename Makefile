@@ -2,7 +2,7 @@ build:
 	@npm run build
 
 serve:
-	@go run .\server\server.go
+	@go run .\main.go
 
 dev:
 	@make build
@@ -15,11 +15,11 @@ release:
 
 release-windows:
 	@make release
-	@cd .\server && go build -o ..\dist-ssr\server.exe
+	@go build -o .\dist-ssr\server.exe
 
 release-linux:
 	@make release
 	@set CGO_ENABLED=0
 	@set GOOS=linux
 	@set GOARCH=amd64
-	@cd .\server && go build -o ..\dist-ssr\server.o
+	@go build -o .\dist-ssr\server.o
