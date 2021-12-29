@@ -1,5 +1,7 @@
 package model
 
+import "fmt"
+
 type GitHubData struct {
 	Data struct {
 		User struct {
@@ -16,9 +18,13 @@ type GitHubData struct {
 	} `json:"data"`
 }
 
-func (g *GitHubData) GetContributionOfLastSevenDays() []ContributionEntry {
+func (g *GitHubData) GetContributionOfLastSevenDays() ([]ContributionEntry, error) {
 	weeks := g.Data.User.ContributionsCollection.ContributionCalendar.Weeks
 	weekLength := len(g.Data.User.ContributionsCollection.ContributionCalendar.Weeks)
+
+	if weekLength < 2 {
+		return nil, fmt.Errorf("No data available")
+	}
 
 	var contributionOfLastTwoWeeks []ContributionEntry
 	lastTwoWeeks := weeks[weekLength-2:]
@@ -33,7 +39,7 @@ func (g *GitHubData) GetContributionOfLastSevenDays() []ContributionEntry {
 		}
 	}
 
-	return contributionOfLastTwoWeeks[len(contributionOfLastTwoWeeks)-7:]
+	return contributionOfLastTwoWeeks[len(contributionOfLastTwoWeeks)-7:], nil
 }
 
 type ContributionDays struct {

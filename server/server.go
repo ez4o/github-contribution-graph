@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"path"
 	"strings"
 	"time"
@@ -18,13 +19,17 @@ type Server struct {
 	GitHubToken string
 }
 
-func handleError(err error) {
-	if err != nil {
-		fmt.Printf("The HTTP request failed with error %s\n", err)
+func getRequestParams(v url.Values) model.RequestParams {
+	username := v.Get("username")
+
+	params := model.RequestParams{
+		Username: username,
 	}
+
+	return params
 }
 
-func (s *Server) getContributionData(username string) []model.ContributionEntry {
+func (s *Server) getContributionData(w http.ResponseWriter, username string) ([]model.ContributionEntry, error) {
 	var requestBody bytes.Buffer
 
 	requestBodyObj := struct {
@@ -55,26 +60,47 @@ func (s *Server) getContributionData(username string) []model.ContributionEntry 
 	}
 
 	err := json.NewEncoder(&requestBody).Encode(requestBodyObj)
-	handleError(err)
+	if err != nil {
+		return nil, err
+	}
 
 	req, err := http.NewRequest("POST", "https://api.github.com/graphql", &requestBody)
-	handleError(err)
+	if err != nil {
+		return nil, err
+	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", s.GitHubToken))
 
 	client := &http.Client{Timeout: time.Second * 10}
 
 	resp, err := client.Do(req)
-	handleError(err)
+	if err != nil {
+		return nil, err
+	}
 	defer resp.Body.Close()
 
 	data, err := ioutil.ReadAll(resp.Body)
-	handleError(err)
+	if err != nil {
+		return nil, err
+	}
+
+	var tmp map[string]interface{}
+	err = json.Unmarshal(data, &tmp)
+	if err != nil {
+		return nil, err
+	}
 
 	var result model.GitHubData
-	json.Unmarshal(data, &result)
+	err = json.Unmarshal(data, &result)
+	if err != nil {
+		return nil, err
+	}
 
-	t := result.GetContributionOfLastSevenDays()
-	return t
+	t, err := result.GetContributionOfLastSevenDays()
+	if err != nil {
+		return nil, err
+	}
+
+	return t, nil
 }
 
 func (s *Server) hydrateContributionData(data []model.ContributionEntry) template.JS {
@@ -90,6 +116,11 @@ func (s *Server) hydrateContributionData(data []model.ContributionEntry) templat
 }
 
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
+	params := getRequestParams(r.URL.Query())
+	if params.Username == "" {
+		fmt.Fprint(w, "Url param 'username' is missing.")
+	}
+
 	tmpl, err := template.New("index.html").Funcs(
 		template.FuncMap{
 			"hydrateContributionData": s.hydrateContributionData,
@@ -98,11 +129,20 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		path.Join("dist", "index.html"),
 	)
 	if err != nil {
-		panic(err)
+		fmt.Fprintln(w, "Error while parsing template.")
+
+		return
+	}
+
+	contributiondata, err := s.getContributionData(w, params.Username)
+	if err != nil {
+		fmt.Fprintln(w, "Error while parsing response from GitHub, please check all your request parameters.")
+
+		return
 	}
 
 	tmpl.Execute(w, &model.TemplateData{
-		ContributionData: s.getContributionData("wst24365888"),
+		ContributionData: contributiondata,
 	})
 }
 
