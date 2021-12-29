@@ -10,7 +10,23 @@ const hydratedContributionData: ContributionEntry[] = mockContributionData
 const width = 640
 const height = 640
 
+const username = 'Xyphuz';
 const imgUrl = 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60';
+
+const margin = 35;
+const textMargin = 10;
+const chartMargin = 25;
+
+const barOffsetX = 20;
+const barWidth = 28;
+const baseBarHeight = 10;
+
+const fontSize = '0.7em';
+const lineHeight = 20;
+const titleLineHeight = 40;
+
+const titleX = 80;
+const titleY = 500;
 
 const svg = d3
   .select('#app')
@@ -26,17 +42,6 @@ svg
   .attr('xlink:href', imgUrl)
   .attr('preserveAspectRatio', 'none');
 
-const margin = 35;
-const textMargin = 10;
-const chartMargin = 25;
-const lineHeight = 20;
-
-const barOffsetX = 20;
-const barWidth = 28;
-const baseBarHeight = 10;
-
-const fontSize = '0.7em';
-
 const x = d3
   .scaleBand()
   .range([width / 2 - margin - barOffsetX + chartMargin, width - margin * 2 - barOffsetX]);
@@ -46,7 +51,7 @@ const y = d3
   .range([height / 2, 0]);
 
 const endPoint = ((max: number) => {
-  return (Math.floor(max / 5) + 1) * 5;
+  return (Math.ceil(max / 5) + 1) * 5;
 })(d3.max(hydratedContributionData.map(d => d.amount))!);
 
 x.domain(hydratedContributionData.map(d => d.dateString));
@@ -151,17 +156,17 @@ svg
 
 svg
   .append('text')
-  .attr('x', 80)
-  .attr('y', 500)
+  .attr('x', titleX)
+  .attr('y', titleY)
   .attr('fill', '#666')
   .attr('font-size', fontSize)
   .text('Contribution Graph of');
 
 svg
   .append('text')
-  .attr('x', 80)
-  .attr('y', 540)
+  .attr('x', titleX)
+  .attr('y', titleY + titleLineHeight)
   .attr('fill', '#000')
   .attr('font-size', "2rem")
   .attr('font-weight', 'bold')
-  .text('Xyphuz');
+  .text(username);
