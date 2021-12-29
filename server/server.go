@@ -118,7 +118,9 @@ func (s *Server) hydrateContributionData(data []model.ContributionEntry) templat
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	params := getRequestParams(r.URL.Query())
 	if params.Username == "" {
-		fmt.Fprint(w, "Url param 'username' is missing.")
+		fmt.Fprintln(w, "Url param 'username' is missing.")
+
+		return
 	}
 
 	tmpl, err := template.New("index.html").Funcs(
