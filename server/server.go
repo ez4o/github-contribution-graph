@@ -1,32 +1,80 @@
 package server
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"net/http"
 	"path"
 	"strings"
+	"time"
 
 	"server/model"
 )
 
-type Server struct{}
+type Server struct {
+	GitHubToken string
+}
 
-func (s *Server) getContributionData() []model.ContributionEntry {
-	return []model.ContributionEntry{
-		{
-			DateString: "2018-01-01",
-			Amount:     18,
-		},
-		{
-			DateString: "2018-01-02",
-			Amount:     12,
-		},
-		{
-			DateString: "2018-01-03",
-			Amount:     16,
+func handleError(err error) {
+	if err != nil {
+		fmt.Printf("The HTTP request failed with error %s\n", err)
+	}
+}
+
+func (s *Server) getContributionData(username string) []model.ContributionEntry {
+	var requestBody bytes.Buffer
+
+	requestBodyObj := struct {
+		Query     string                 `json:"query"`
+		Variables map[string]interface{} `json:"variables"`
+	}{
+		Query: `
+			query userInfo($LOGIN: String!) {
+				user(login: $LOGIN) {
+					name
+					contributionsCollection {
+					contributionCalendar {
+						totalContributions
+							weeks {
+								contributionDays {
+									contributionCount
+									date
+								}
+							}
+						}
+					}
+				}
+			},
+		`,
+		Variables: map[string]interface{}{
+			"LOGIN": username,
 		},
 	}
+
+	err := json.NewEncoder(&requestBody).Encode(requestBodyObj)
+	handleError(err)
+
+	req, err := http.NewRequest("POST", "https://api.github.com/graphql", &requestBody)
+	handleError(err)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", s.GitHubToken))
+
+	client := &http.Client{Timeout: time.Second * 10}
+
+	resp, err := client.Do(req)
+	handleError(err)
+	defer resp.Body.Close()
+
+	data, err := ioutil.ReadAll(resp.Body)
+	handleError(err)
+
+	var result model.GitHubData
+	json.Unmarshal(data, &result)
+
+	t := result.GetContributionOfLastSevenDays()
+	return t
 }
 
 func (s *Server) hydrateContributionData(data []model.ContributionEntry) template.JS {
@@ -54,7 +102,7 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tmpl.Execute(w, &model.TemplateData{
-		ContributionData: s.getContributionData(),
+		ContributionData: s.getContributionData("wst24365888"),
 	})
 }
 

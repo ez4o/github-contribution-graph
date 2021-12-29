@@ -11,6 +11,7 @@ dev:
 release:
 	@make build
 	@if not exist .\dist-ssr mkdir .\dist-ssr
+	@copy .\config.json .\dist-ssr\config.json
 	@xcopy .\dist .\dist-ssr\dist\ /E /I /Q /Y
 
 release-windows:
