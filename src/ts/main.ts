@@ -1,50 +1,167 @@
 import '../css/style.css'
 import * as d3 from "d3";
 import { ContributionEntry } from './model/ContributionEntry';
+import { mockContributionData } from './data/mock_contribution_data';
 
 // @ts-ignore
-const hydratedContributionData = contributionData as unknown as ContributionEntry[]
+// const hydratedContributionData = contributionData as unknown as ContributionEntry[]
+const hydratedContributionData: ContributionEntry[] = mockContributionData
 
-const width = window.innerWidth / 2
-const height = window.innerHeight / 2
+const width = 640
+const height = 640
 
-const svg = d3.select('#app')
+const imgUrl = 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60';
+
+const svg = d3
+  .select('#app')
   .append('svg')
   .attr('width', width)
   .attr('height', height);
 
+svg
+  .append('svg:image')
+  .attr('id', 'background')
+  .attr('width', width)
+  .attr('height', height)
+  .attr('xlink:href', imgUrl)
+  .attr('preserveAspectRatio', 'none');
+
+const margin = 35;
+const textMargin = 10;
+const chartMargin = 25;
+const lineHeight = 20;
+
+const barOffsetX = 20;
+const barWidth = 28;
+const baseBarHeight = 10;
+
+const fontSize = '0.7em';
+
 const x = d3
   .scaleBand()
-  .range([0, width])
+  .range([width / 2 - margin - barOffsetX + chartMargin, width - margin * 2 - barOffsetX]);
 
-const y = d3.scaleLinear().range([height, 0])
+const y = d3
+  .scaleLinear()
+  .range([height / 2, 0]);
 
-function getHeightEndpoint(val: number) {
-  let count = Math.floor(val).toString().length - 1
-  let step = Math.pow(10, count)
+const endPoint = ((max: number) => {
+  return (Math.floor(max / 5) + 1) * 5;
+})(d3.max(hydratedContributionData.map(d => d.amount))!);
 
-  if (val / step < 5) {
-    step = step / 2
-  }
-
-  count = Math.ceil(val / step)
-
-  return count * step
-}
-
-const endPoint = getHeightEndpoint(d3.max(hydratedContributionData.map(d => d.amount))!)
-
-x.domain(hydratedContributionData.map(d => d.dateString))
-y.domain([0, endPoint])
+x.domain(hydratedContributionData.map(d => d.dateString));
+y.domain([0, endPoint]);
 
 svg
-  .selectAll('rect')
+  .append('rect')
+  .attr('id', 'chart-background')
+  .attr('width', width - margin * 2)
+  .attr('height', height - margin * 2)
+  .attr('fill', '#fff')
+  .attr('x', margin)
+  .attr('y', margin);
+
+const clipPath = svg
+  .append("defs")
+  .append("clipPath")
+  .attr("id", "clip")
+
+clipPath
+  .selectAll('upper-bar')
   .data(hydratedContributionData)
   .enter()
   .append('rect')
+  .attr('class', 'bar')
+  .attr("clip-path", "url(#chart-background)")
   .attr('x', d => x(d.dateString)!)
-  .attr('width', 24)
-  .attr('y', d => y(d.amount))
-  .attr('height', d => height - y(d.amount))
-  .attr('fill', '#09c')
-  .attr('transform', `translate(${x.bandwidth() / 2 - 12}, 0)`)
+  .attr('y', d => y(d.amount) - baseBarHeight / 2)
+  .attr('width', barWidth)
+  .attr('height', d => height / 2 - y(d.amount) + baseBarHeight)
+  .attr('transform', `translate(${(x.bandwidth() - barWidth) / 2}, 0)`);
+
+clipPath
+  .selectAll('lower-bar')
+  .data(hydratedContributionData)
+  .enter()
+  .append('rect')
+  .attr('class', 'bar')
+  .attr('x', d => x(d.dateString)!)
+  .attr('y', height / 2 + baseBarHeight / 2)
+  .attr('width', barWidth)
+  .attr('height', d => height / 2 - y(d.amount) + baseBarHeight)
+  .attr('fill', `rgba(0, 0, 0, 0.2)`)
+  .attr('transform', `translate(${(x.bandwidth() - barWidth) / 2}, 0)`);
+
+svg
+  .append('svg:image')
+  .attr("clip-path", "url(#clip)")
+  .attr('width', width)
+  .attr('height', height)
+  .attr('xlink:href', imgUrl)
+  .attr('preserveAspectRatio', 'none');
+
+svg
+  .selectAll('contribution-amount')
+  .data(hydratedContributionData)
+  .enter()
+  .append('text')
+  .attr('x', d => x(d.dateString)! + barWidth / 2)
+  .attr('y', d => y(d.amount) - lineHeight / 2)
+  .attr('width', barWidth)
+  .attr('height', d => height / 2 - y(d.amount))
+  .attr('fill', '#000')
+  .attr('transform', `translate(${(x.bandwidth() - barWidth) / 2}, 0)`)
+  .attr('text-anchor', 'middle')
+  .attr('font-size', fontSize)
+  .text(d => d.amount);
+
+svg
+  .append('text')
+  .attr('x', width / 2 - margin - barOffsetX + chartMargin - textMargin - 4)
+  .attr('y', height / 2 - lineHeight / 2)
+  .attr('fill', '#000')
+  .attr('text-anchor', 'end')
+  .attr('font-size', fontSize)
+  .text(hydratedContributionData[0].dateString.substring(0, 4));
+
+svg
+  .append('text')
+  .attr('x', width / 2 - margin - barOffsetX + chartMargin - textMargin - 4)
+  .attr('y', height / 2 + lineHeight / 2)
+  .attr('fill', '#000')
+  .attr('text-anchor', 'end')
+  .attr('font-size', fontSize)
+  .text(hydratedContributionData[0].dateString.substring(5, 10));
+
+svg
+  .append('text')
+  .attr('x', width - margin * 2 - barOffsetX + textMargin)
+  .attr('y', height / 2 - lineHeight / 2)
+  .attr('fill', '#000')
+  .attr('font-size', fontSize)
+  .text(hydratedContributionData[hydratedContributionData.length - 1].dateString.substring(0, 4));
+
+svg
+  .append('text')
+  .attr('x', width - margin * 2 - barOffsetX + textMargin)
+  .attr('y', height / 2 + lineHeight / 2)
+  .attr('fill', '#000')
+  .attr('font-size', fontSize)
+  .text(hydratedContributionData[hydratedContributionData.length - 1].dateString.substring(5, 10));
+
+svg
+  .append('text')
+  .attr('x', 80)
+  .attr('y', 500)
+  .attr('fill', '#666')
+  .attr('font-size', fontSize)
+  .text('Contribution Graph of');
+
+svg
+  .append('text')
+  .attr('x', 80)
+  .attr('y', 540)
+  .attr('fill', '#000')
+  .attr('font-size', "2rem")
+  .attr('font-weight', 'bold')
+  .text('Xyphuz');
