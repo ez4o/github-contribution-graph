@@ -1,4 +1,4 @@
-import './style.css'
+import '../css/style.css'
 import * as d3 from "d3";
 import { ContributionEntry } from './model/ContributionEntry';
 
