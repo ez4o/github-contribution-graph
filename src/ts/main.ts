@@ -1,17 +1,17 @@
 import '../css/style.css'
 import * as d3 from "d3";
 import { ContributionEntry } from './model/ContributionEntry';
-import { mockContributionData } from './data/mock_contribution_data';
+// import { mockContributionData } from './data/mock_contribution_data';
 
 // @ts-ignore
-// const hydratedContributionData = contributionData as unknown as ContributionEntry[]
-const hydratedContributionData: ContributionEntry[] = mockContributionData
+const hydratedContributionData = contributionData as unknown as ContributionEntry[]
+// const hydratedContributionData: ContributionEntry[] = mockContributionData
+
+const hydratedUsername = 'Xyphuz';
+const hydratedImgUrl = 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60';
 
 const width = 640
 const height = 640
-
-const username = 'Xyphuz';
-const imgUrl = 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60';
 
 const margin = 35;
 const textMargin = 10;
@@ -22,6 +22,7 @@ const barWidth = 28;
 const baseBarHeight = 10;
 
 const fontSize = '0.7em';
+const textWidth = 20;
 const lineHeight = 20;
 const titleLineHeight = 40;
 
@@ -39,7 +40,7 @@ svg
   .attr('id', 'background')
   .attr('width', width)
   .attr('height', height)
-  .attr('xlink:href', imgUrl)
+  .attr('xlink:href', hydratedImgUrl)
   .attr('preserveAspectRatio', 'none');
 
 const x = d3
@@ -51,7 +52,7 @@ const y = d3
   .range([height / 2, 0]);
 
 const endPoint = ((max: number) => {
-  return (Math.ceil(max / 5) + 1) * 5;
+  return (Math.ceil(max / 4) + 1) * 4;
 })(d3.max(hydratedContributionData.map(d => d.amount))!);
 
 x.domain(hydratedContributionData.map(d => d.dateString));
@@ -102,7 +103,7 @@ svg
   .attr("clip-path", "url(#clip)")
   .attr('width', width)
   .attr('height', height)
-  .attr('xlink:href', imgUrl)
+  .attr('xlink:href', hydratedImgUrl)
   .attr('preserveAspectRatio', 'none');
 
 svg
@@ -122,35 +123,37 @@ svg
 
 svg
   .append('text')
-  .attr('x', width / 2 - margin - barOffsetX + chartMargin - textMargin - 4)
+  .attr('x', width / 2 - margin - barOffsetX + chartMargin - textMargin - textWidth / 2 - 4)
   .attr('y', height / 2 - lineHeight / 2)
   .attr('fill', '#000')
-  .attr('text-anchor', 'end')
+  .attr('text-anchor', 'middle')
   .attr('font-size', fontSize)
   .text(hydratedContributionData[0].dateString.substring(0, 4));
 
 svg
   .append('text')
-  .attr('x', width / 2 - margin - barOffsetX + chartMargin - textMargin - 4)
+  .attr('x', width / 2 - margin - barOffsetX + chartMargin - textMargin - textWidth / 2 - 4)
   .attr('y', height / 2 + lineHeight / 2)
   .attr('fill', '#000')
-  .attr('text-anchor', 'end')
+  .attr('text-anchor', 'middle')
   .attr('font-size', fontSize)
   .text(hydratedContributionData[0].dateString.substring(5, 10));
 
 svg
   .append('text')
-  .attr('x', width - margin * 2 - barOffsetX + textMargin)
+  .attr('x', width - margin * 2 - barOffsetX + textMargin + textWidth / 2)
   .attr('y', height / 2 - lineHeight / 2)
   .attr('fill', '#000')
+  .attr('text-anchor', 'middle')
   .attr('font-size', fontSize)
   .text(hydratedContributionData[hydratedContributionData.length - 1].dateString.substring(0, 4));
 
 svg
   .append('text')
-  .attr('x', width - margin * 2 - barOffsetX + textMargin)
+  .attr('x', width - margin * 2 - barOffsetX + textMargin + textWidth / 2)
   .attr('y', height / 2 + lineHeight / 2)
   .attr('fill', '#000')
+  .attr('text-anchor', 'middle')
   .attr('font-size', fontSize)
   .text(hydratedContributionData[hydratedContributionData.length - 1].dateString.substring(5, 10));
 
@@ -169,4 +172,4 @@ svg
   .attr('fill', '#000')
   .attr('font-size', "2rem")
   .attr('font-weight', 'bold')
-  .text(username);
+  .text(hydratedUsername);
