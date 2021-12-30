@@ -10,9 +10,9 @@ dev:
 
 release:
 	@make build
-	@if not exist .\dist-ssr mkdir .\dist-ssr
+	@if not exist .\dist-ssr\dist mkdir .\dist-ssr\dist
 	@copy .\config.json .\dist-ssr\config.json
-	@xcopy .\dist .\dist-ssr\dist\ /E /I /Q /Y
+	@copy .\dist\index.html .\dist-ssr\dist\index.html
 
 release-windows:
 	@make release
@@ -20,7 +20,5 @@ release-windows:
 
 release-linux:
 	@make release
-	@set CGO_ENABLED=0
-	@set GOOS=linux
-	@set GOARCH=amd64
-	@go build -o .\dist-ssr\server.o
+	@REM avoid white space after env variable
+	@set CGO_ENABLED=0&& set GOOS=linux&& set GOARCH=amd64&& go build -o .\dist-ssr\server.o

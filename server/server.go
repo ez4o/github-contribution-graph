@@ -29,7 +29,7 @@ func getRequestParams(v url.Values) model.RequestParams {
 	return params
 }
 
-func (s *Server) getContributionData(w http.ResponseWriter, username string) ([]model.ContributionEntry, error) {
+func (s *Server) getContributionData(w http.ResponseWriter, id string) ([]model.ContributionEntry, string, error) {
 	var requestBody bytes.Buffer
 
 	requestBodyObj := struct {
@@ -55,18 +55,18 @@ func (s *Server) getContributionData(w http.ResponseWriter, username string) ([]
 			},
 		`,
 		Variables: map[string]interface{}{
-			"LOGIN": username,
+			"LOGIN": id,
 		},
 	}
 
 	err := json.NewEncoder(&requestBody).Encode(requestBodyObj)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	req, err := http.NewRequest("POST", "https://api.github.com/graphql", &requestBody)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", s.GitHubToken))
 
@@ -74,33 +74,38 @@ func (s *Server) getContributionData(w http.ResponseWriter, username string) ([]
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	defer resp.Body.Close()
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	var tmp map[string]interface{}
 	err = json.Unmarshal(data, &tmp)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	var result model.GitHubData
 	err = json.Unmarshal(data, &result)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	t, err := result.GetContributionOfLastSevenDays()
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	return t, nil
+	username := result.Data.User.Name
+	if username == "" {
+		username = id
+	}
+
+	return t, username, nil
 }
 
 func (s *Server) hydrateContributionData(data []model.ContributionEntry) template.JS {
@@ -136,7 +141,7 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	contributiondata, err := s.getContributionData(w, params.Username)
+	contributiondata, username, err := s.getContributionData(w, params.Username)
 	if err != nil {
 		fmt.Fprintln(w, "Error while parsing response from GitHub, please check all your request parameters.")
 
@@ -145,23 +150,12 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 
 	tmpl.Execute(w, &model.TemplateData{
 		ContributionData: contributiondata,
+		Username:         username,
+		ImgUrl:           "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60",
 	})
 }
 
 func (s *Server) Start() {
 	http.HandleFunc("/", s.handleIndex)
-
-	// Create file server at "./dist/assets".
-	// Cut off the prefix "/assets/" of request path and forward to it.
-	fs := http.FileServer(http.Dir("./dist/assets"))
-	http.HandleFunc("/assets/", func(w http.ResponseWriter, r *http.Request) {
-		if path.Ext(r.URL.Path) == ".js" {
-			// https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
-			w.Header().Set("Content-Type", "text/javascript")
-		}
-
-		http.StripPrefix("/assets/", fs).ServeHTTP(w, r)
-	})
-
-	http.ListenAndServe(":80", nil)
+	http.ListenAndServe(":8686", nil)
 }
