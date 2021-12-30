@@ -168,7 +168,7 @@ func (s *Server) handleRender(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (s *Server) handleSVG(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleSVG(w http.ResponseWriter, r *http.Request, b *rod.Browser) {
 	params := getRequestParams(r.URL.Query())
 	if params.Username == "" {
 		fmt.Fprintln(w, "Url param 'username' is missing.")
@@ -176,14 +176,8 @@ func (s *Server) handleSVG(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	l := launcher.New()
-	l.Set("no-sandbox")
-	headlessBrowserUrl := l.MustLaunch()
-
-	browser := rod.New().ControlURL(headlessBrowserUrl).MustConnect()
-
-	page := browser.MustPage(fmt.Sprintf("http://localhost:8687/?username=%s", params.Username))
-	page.WaitLoad()
+	page := b.MustPage(fmt.Sprintf("http://localhost:8687/?username=%s", params.Username))
+	page.MustWaitLoad()
 
 	el := page.MustElement("#svg-container")
 
@@ -198,7 +192,14 @@ func (s *Server) Start() {
 	ssrServer.HandleFunc("/", s.handleRender)
 	go http.ListenAndServe(":8687", ssrServer)
 
+	l := launcher.New()
+	l.Set("no-sandbox")
+	headlessBrowserUrl := l.MustLaunch()
+	browser := rod.New().ControlURL(headlessBrowserUrl).MustConnect()
+
 	svgServer := http.NewServeMux()
-	svgServer.HandleFunc("/", s.handleSVG)
+	svgServer.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		s.handleSVG(w, r, browser)
+	})
 	http.ListenAndServe(":8686", svgServer)
 }
