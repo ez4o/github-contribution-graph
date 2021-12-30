@@ -16,5 +16,6 @@
     {{ hydrateContributionData .ContributionData }}
   ];
   const username = '{{ .Username }}';
+  const imgBase64String = 'data:image/jpeg;charset=utf-8;base64,{{ .ImgBase64String }}';
 </script>
 <script type="module" src="/src/client/main.ts"></script>

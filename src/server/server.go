@@ -16,6 +16,7 @@ import (
 	"github.com/go-rod/rod/lib/launcher"
 
 	"server/model"
+	"server/util"
 )
 
 type Server struct {
@@ -151,12 +152,19 @@ func (s *Server) handleRender(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	imgBase64String, err := util.GetBase64FromImgUrl("https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60")
+	if err != nil {
+		fmt.Fprintln(w, "Error while parsing image, please check all your request parameters.")
+
+		return
+	}
+
 	w.Header().Set("Content-Type", "text/html")
 
 	tmpl.Execute(w, &model.TemplateData{
 		ContributionData: contributiondata,
 		Username:         username,
-		ImgUrl:           "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60",
+		ImgBase64String:  imgBase64String,
 	})
 }
 
