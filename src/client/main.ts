@@ -1,4 +1,3 @@
-import '../css/style.css'
 import * as d3 from "d3";
 import { ContributionEntry } from './model/ContributionEntry';
 // import { mockContributionData } from './data/mock_contribution_data';
@@ -33,7 +32,7 @@ const titleX = 80;
 const titleY = 500;
 
 const svg = d3
-  .select('#app')
+  .select('#svg-container')
   .append('svg')
   .attr('width', width)
   .attr('height', height);

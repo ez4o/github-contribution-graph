@@ -12,6 +12,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/launcher"
+
 	"server/model"
 )
 
@@ -120,7 +123,7 @@ func (s *Server) hydrateContributionData(data []model.ContributionEntry) templat
 	return template.JS(strings.Join(entryToHydrate, ",\n"))
 }
 
-func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleRender(w http.ResponseWriter, r *http.Request) {
 	params := getRequestParams(r.URL.Query())
 	if params.Username == "" {
 		fmt.Fprintln(w, "Url param 'username' is missing.")
@@ -148,6 +151,8 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "text/html")
+
 	tmpl.Execute(w, &model.TemplateData{
 		ContributionData: contributiondata,
 		Username:         username,
@@ -155,7 +160,37 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (s *Server) handleSVG(w http.ResponseWriter, r *http.Request) {
+	params := getRequestParams(r.URL.Query())
+	if params.Username == "" {
+		fmt.Fprintln(w, "Url param 'username' is missing.")
+
+		return
+	}
+
+	l := launcher.New()
+	l.Set("no-sandbox")
+	headlessBrowserUrl := l.MustLaunch()
+
+	browser := rod.New().ControlURL(headlessBrowserUrl).MustConnect()
+
+	page := browser.MustPage(fmt.Sprintf("http://localhost:8687/?username=%s", params.Username))
+	page.WaitLoad()
+
+	el := page.MustElement("#svg-container")
+
+	w.Header().Set("Content-Type", "image/svg+xml; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+
+	fmt.Fprint(w, el.MustHTML())
+}
+
 func (s *Server) Start() {
-	http.HandleFunc("/", s.handleIndex)
-	http.ListenAndServe(":8686", nil)
+	ssrServer := http.NewServeMux()
+	ssrServer.HandleFunc("/", s.handleRender)
+	go http.ListenAndServe(":8687", ssrServer)
+
+	svgServer := http.NewServeMux()
+	svgServer.HandleFunc("/", s.handleSVG)
+	http.ListenAndServe(":8686", svgServer)
 }

@@ -1,4 +1,14 @@
-<svg id="app">
+<svg id="svg-container" width="640" height="640" viewBox="0 0 640 640" fill="none" xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap");
+
+    * {
+      margin: 0;
+      padding: 0;
+      font-family: "Montserrat";
+    }
+  </style>
 </svg>
 
 <script>
@@ -7,4 +17,4 @@
   ];
   const username = '{{ .Username }}';
 </script>
-<script type="module" src="/src/ts/main.ts"></script>
+<script type="module" src="/src/client/main.ts"></script>
