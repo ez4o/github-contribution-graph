@@ -97,6 +97,7 @@ func (s *Server) handleSVG(w http.ResponseWriter, r *http.Request, b *rod.Browse
 		svg := page.MustElement("#svg-container")
 
 		w.Header().Set("Content-Type", "image/svg+xml; charset=utf-8")
+		w.Header().Set("Cache-Control", "public, max-age=600")
 		w.WriteHeader(http.StatusOK)
 
 		fmt.Fprintln(w, svg.MustHTML())
