@@ -1,16 +1,11 @@
 package server
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"html/template"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"path"
-	"strings"
-	"time"
 
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
@@ -23,118 +18,49 @@ type Server struct {
 	GitHubToken string
 }
 
-func getRequestParams(v url.Values) model.RequestParams {
-	username := v.Get("username")
-
-	params := model.RequestParams{
-		Username: username,
-	}
-
-	return params
-}
-
-func (s *Server) getContributionData(w http.ResponseWriter, id string) ([]model.ContributionEntry, string, error) {
-	var requestBody bytes.Buffer
-
-	requestBodyObj := struct {
-		Query     string                 `json:"query"`
-		Variables map[string]interface{} `json:"variables"`
-	}{
-		Query: `
-			query userInfo($LOGIN: String!) {
-				user(login: $LOGIN) {
-					name
-					contributionsCollection {
-					contributionCalendar {
-						totalContributions
-							weeks {
-								contributionDays {
-									contributionCount
-									date
-								}
-							}
-						}
-					}
-				}
-			},
-		`,
-		Variables: map[string]interface{}{
-			"LOGIN": id,
-		},
-	}
-
-	err := json.NewEncoder(&requestBody).Encode(requestBodyObj)
-	if err != nil {
-		return nil, "", err
-	}
-
-	req, err := http.NewRequest("POST", "https://api.github.com/graphql", &requestBody)
-	if err != nil {
-		return nil, "", err
-	}
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", s.GitHubToken))
-
-	client := &http.Client{Timeout: time.Second * 10}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, "", err
-	}
-	defer resp.Body.Close()
-
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, "", err
-	}
-
-	var tmp map[string]interface{}
-	err = json.Unmarshal(data, &tmp)
-	if err != nil {
-		return nil, "", err
-	}
-
-	var result model.GitHubData
-	err = json.Unmarshal(data, &result)
-	if err != nil {
-		return nil, "", err
-	}
-
-	t, err := result.GetContributionOfLastSevenDays()
-	if err != nil {
-		return nil, "", err
-	}
-
-	username := result.Data.User.Name
-	if username == "" {
-		username = id
-	}
-
-	return t, username, nil
-}
-
-func (s *Server) hydrateContributionData(data []model.ContributionEntry) template.JS {
-	entryToHydrate := make([]string, len(data))
-	for i, entry := range data {
-		entryToHydrate[i] = fmt.Sprintf(
-			"{dateString: '%s', amount: %d}",
-			entry.DateString, entry.Amount,
-		)
-	}
-
-	return template.JS(strings.Join(entryToHydrate, ",\n"))
-}
-
 func (s *Server) handleRender(w http.ResponseWriter, r *http.Request) {
-	params := getRequestParams(r.URL.Query())
+	params := util.GetRequestParams(r.URL.Query())
 	if params.Username == "" {
 		fmt.Fprintln(w, "Url param 'username' is missing.")
 
 		return
 	}
 
+	if params.ImgUrl == "" {
+		params.ImgUrl = "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
+	} else {
+		imgUrl, err := url.QueryUnescape(params.ImgUrl)
+		if err != nil {
+			fmt.Fprintln(w, "Error while parsing image url.")
+
+			return
+		}
+
+		params.ImgUrl = imgUrl
+	}
+
+	contributiondata, username, err := util.GetContributionData(w, params.Username, s.GitHubToken)
+	if err != nil {
+		fmt.Fprintln(w, "Error while parsing response from GitHub, please check all your request parameters.")
+
+		return
+	}
+
+	imgBase64String, err := util.GetBase64FromImgUrl(params.ImgUrl)
+	if err != nil {
+		fmt.Fprintln(w, "Error while parsing image, please check all your request parameters.")
+
+		return
+	}
+
+	imgType, err := util.GetImgTypeFromBase64(imgBase64String)
+	if err != nil {
+		fmt.Fprintln(w, "Error while parsing image:", err.Error())
+	}
+
 	tmpl, err := template.New("index.html").Funcs(
 		template.FuncMap{
-			"hydrateContributionData": s.hydrateContributionData,
+			"hydrateContributionData": util.HydrateContributionData,
 		},
 	).ParseFiles(
 		path.Join("dist", "index.html"),
@@ -145,79 +71,35 @@ func (s *Server) handleRender(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	contributiondata, username, err := s.getContributionData(w, params.Username)
-	if err != nil {
-		fmt.Fprintln(w, "Error while parsing response from GitHub, please check all your request parameters.")
-
-		return
-	}
-
-	imgBase64String, err := util.GetBase64FromImgUrl("https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60")
-	if err != nil {
-		fmt.Fprintln(w, "Error while parsing image, please check all your request parameters.")
-
-		return
-	}
-
 	w.Header().Set("Content-Type", "text/html")
 
 	tmpl.Execute(w, &model.TemplateData{
 		ContributionData: contributiondata,
 		Username:         username,
+		ImgType:          imgType,
 		ImgBase64String:  imgBase64String,
 	})
 }
 
 func (s *Server) handleSVG(w http.ResponseWriter, r *http.Request, b *rod.Browser) {
-	params := getRequestParams(r.URL.Query())
-	if params.Username == "" {
-		fmt.Fprintln(w, "Url param 'username' is missing.")
-
-		return
-	}
-
-	page := b.MustPage(fmt.Sprintf("http://localhost:8687/?username=%s", params.Username))
+	page := b.MustPage(fmt.Sprintf("http://localhost:8687/?%s", r.URL.Query().Encode()))
 	defer page.Close()
 	page.MustWaitLoad()
 
-	errChan := make(chan *rod.Element)
-	defer close(errChan)
-
-	elChan := make(chan *rod.Element)
-	defer close(elChan)
-
-	go func() {
+	if page.MustHas("pre") {
 		pre := page.MustElement("pre")
-		if pre.MustText() != "" {
-			errChan <- pre
-		}
-	}()
 
-	go func() {
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusInternalServerError)
+
+		fmt.Fprintln(w, pre.MustText())
+	} else {
 		svg := page.MustElement("#svg-container")
-		if svg.MustText() != "" {
-			elChan <- svg
-		}
-	}()
 
-WRITE_TO_RESPONSE:
-	for {
-		select {
-		case err := <-errChan:
-			w.Header().Set("Content-Type", "text/plain")
-			w.WriteHeader(http.StatusInternalServerError)
+		w.Header().Set("Content-Type", "image/svg+xml; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
 
-			fmt.Fprintln(w, err.MustText())
-
-			break WRITE_TO_RESPONSE
-		case el := <-elChan:
-			w.Header().Set("Content-Type", "image/svg+xml; charset=utf-8")
-			w.WriteHeader(http.StatusOK)
-
-			fmt.Fprintln(w, el.MustHTML())
-
-			break WRITE_TO_RESPONSE
-		}
+		fmt.Fprintln(w, svg.MustHTML())
 	}
 }
 
