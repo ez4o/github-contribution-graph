@@ -118,7 +118,7 @@ these simple steps.
    go get -u
    ```
 
-Generate Dist-SSR
+### Generate Dist-SSR
 
 1. Use release command, and it will generate `dist-ssr/` with a executable file
    inside.
