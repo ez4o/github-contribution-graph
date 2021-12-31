@@ -77,17 +77,17 @@ website.
 
 ### Parameters
 
-| Parameter            | Description                                                               |
-| -------------------- | ------------------------------------------------------------------------- |
-| `username`           | Your GitHub username.                                                     |
-| `img_url` (Optional) | Background image. Use url encode tool like <https://www.urlencoder.org/>. |
+| Parameter  | Necessity | Description                                                               |
+| ---------- | --------- | ------------------------------------------------------------------------- |
+| `username` | Required  | Your GitHub username.                                                     |
+| `img_url`  | Optional  | Background image. Use url encode tool like <https://www.urlencoder.org/>. |
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Deploy Your Own Server
 
-These are some instructions on setting up your project locally, just follow these
-simple steps.
+These are some instructions on setting up your project locally, just follow
+these simple steps.
 
 ### Prerequisites
 
@@ -101,36 +101,37 @@ simple steps.
 
 1. Clone the repo.
 
-    ```sh
-    git clone https://github.com/ez4o/github-contribution-graph.git
-    cd github-contribution-graph
-    ```
+   ```sh
+   git clone https://github.com/ez4o/github-contribution-graph.git
+   cd github-contribution-graph
+   ```
 
 2. Install npm packages.
 
-    ```sh
-    npm i
-    ```
+   ```sh
+   npm i
+   ```
 
 3. Install Go packages.
 
-    ```sh
-    go get -u
-    ```
+   ```sh
+   go get -u
+   ```
 
 Generate Dist-SSR
 
-1. Use release command, and it will generate `dist-ssr/` with a executable file inside.
+1. Use release command, and it will generate `dist-ssr/` with a executable file
+   inside.
 
-    ```sh
-    make release-windows
-    ```
+   ```sh
+   make release-windows
+   ```
 
-    or
+   or
 
-    ```sh
-    make release-linux
-    ```
+   ```sh
+   make release-linux
+   ```
 
 2. Get `dist-ssr/`, and you can deploy it anywhere!
 
@@ -145,9 +146,8 @@ Generate Dist-SSR
 - [x] Customize Background Image
 - [ ] CSS Animation
 
-See the
-[open issues](https://github.com/ez4o/github-contribution-graph/issues) for a
-full list of proposed features (and known issues).
+See the [open issues](https://github.com/ez4o/github-contribution-graph/issues)
+for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -165,7 +165,8 @@ create a pull request. You can also simply open an issue with the tag
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feat/amazing-feature`)
-3. Commit your Changes with [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+3. Commit your Changes with
+   [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
 4. Push to the Branch (`git push origin feat/amazing-feature`)
 5. Open a Pull Request
 
@@ -175,7 +176,9 @@ create a pull request. You can also simply open an issue with the tag
 
 ## License
 
-Distributed under the MIT License. See [LICENSE](https://github.com/ez4o/github-contribution-graph/blob/main/LICENSE) for more information.
+Distributed under the MIT License. See
+[LICENSE](https://github.com/ez4o/github-contribution-graph/blob/main/LICENSE)
+for more information.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -192,11 +195,9 @@ Distributed under the MIT License. See [LICENSE](https://github.com/ez4o/github-
 
 ## Contact
 
-HSING-HAN, WU (Xyphuz)  -
-xyphuzwu@gmail.com
+HSING-HAN, WU (Xyphuz) - xyphuzwu@gmail.com
 
-Project Link:
-<https://github.com/ez4o/github-contribution-graph>
+Project Link: <https://github.com/ez4o/github-contribution-graph>
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
