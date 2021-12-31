@@ -26,6 +26,7 @@ const baseBarHeight = 10;
 
 const fontSize = '0.7em';
 const textWidth = 20;
+const baseOffsetY = 8;
 const lineHeight = 20;
 const titleLineHeight = 40;
 
@@ -127,7 +128,7 @@ svg
 svg
   .append('text')
   .attr('x', width / 2 - margin - barOffsetX + chartMargin - textMargin - textWidth / 2 - 4)
-  .attr('y', height / 2 - lineHeight / 2)
+  .attr('y', height / 2 - lineHeight / 2 + baseOffsetY)
   .attr('fill', '#000')
   .attr('text-anchor', 'middle')
   .attr('font-size', fontSize)
@@ -136,7 +137,7 @@ svg
 svg
   .append('text')
   .attr('x', width / 2 - margin - barOffsetX + chartMargin - textMargin - textWidth / 2 - 4)
-  .attr('y', height / 2 + lineHeight / 2)
+  .attr('y', height / 2 + lineHeight / 2 + baseOffsetY)
   .attr('fill', '#000')
   .attr('text-anchor', 'middle')
   .attr('font-size', fontSize)
@@ -145,7 +146,7 @@ svg
 svg
   .append('text')
   .attr('x', width - margin * 2 - barOffsetX + textMargin + textWidth / 2)
-  .attr('y', height / 2 - lineHeight / 2)
+  .attr('y', height / 2 - lineHeight / 2 + baseOffsetY)
   .attr('fill', '#000')
   .attr('text-anchor', 'middle')
   .attr('font-size', fontSize)
@@ -154,7 +155,7 @@ svg
 svg
   .append('text')
   .attr('x', width - margin * 2 - barOffsetX + textMargin + textWidth / 2)
-  .attr('y', height / 2 + lineHeight / 2)
+  .attr('y', height / 2 + lineHeight / 2 + baseOffsetY)
   .attr('fill', '#000')
   .attr('text-anchor', 'middle')
   .attr('font-size', fontSize)
