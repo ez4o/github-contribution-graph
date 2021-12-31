@@ -1,4 +1,4 @@
-import { ContributionEntry } from "../model/ContributionEntry";
+import { ContributionEntry } from "../model/contribution_entry";
 
 export const mockContributionData: ContributionEntry[] = [
     {

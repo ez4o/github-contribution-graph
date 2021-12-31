@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { ContributionEntry } from './model/ContributionEntry';
+import { ContributionEntry } from './model/contribution_entry';
 // import { mockContributionData } from './data/mock_contribution_data';
 
 // @ts-ignore
