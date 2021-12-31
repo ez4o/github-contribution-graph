@@ -15,7 +15,7 @@
 <p align="center">
     An awesome tool for dynamically generated contribution graphs that show your GitHub contributions for the last 7 days!
     <br />
-    <a href="https://github.com/ez4o/github-contribution-graph"><strong>Explore Usage »</strong></a>
+    <a href="https://github.com/ez4o/github-contribution-graph#usage"><strong>Explore Usage »</strong></a>
     <br />
     <br />
     <a href="https://github.com/ez4o/github-contribution-graph/issues">Report Bug</a>
