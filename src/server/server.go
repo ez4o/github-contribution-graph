@@ -177,14 +177,48 @@ func (s *Server) handleSVG(w http.ResponseWriter, r *http.Request, b *rod.Browse
 	}
 
 	page := b.MustPage(fmt.Sprintf("http://localhost:8687/?username=%s", params.Username))
+	defer page.Close()
 	page.MustWaitLoad()
 
-	el := page.MustElement("#svg-container")
+	errChan := make(chan *rod.Element)
+	defer close(errChan)
 
-	w.Header().Set("Content-Type", "image/svg+xml; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
+	elChan := make(chan *rod.Element)
+	defer close(elChan)
 
-	fmt.Fprint(w, el.MustHTML())
+	go func() {
+		pre := page.MustElement("pre")
+		if pre.MustText() != "" {
+			errChan <- pre
+		}
+	}()
+
+	go func() {
+		svg := page.MustElement("#svg-container")
+		if svg.MustText() != "" {
+			elChan <- svg
+		}
+	}()
+
+WRITE_TO_RESPONSE:
+	for {
+		select {
+		case err := <-errChan:
+			w.Header().Set("Content-Type", "text/plain")
+			w.WriteHeader(http.StatusInternalServerError)
+
+			fmt.Fprintln(w, err.MustText())
+
+			break WRITE_TO_RESPONSE
+		case el := <-elChan:
+			w.Header().Set("Content-Type", "image/svg+xml; charset=utf-8")
+			w.WriteHeader(http.StatusOK)
+
+			fmt.Fprintln(w, el.MustHTML())
+
+			break WRITE_TO_RESPONSE
+		}
+	}
 }
 
 func (s *Server) Start() {
