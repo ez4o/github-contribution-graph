@@ -118,6 +118,12 @@ these simple steps.
    go get -u
    ```
 
+4. Fill in the [GitHub token](https://github.com/settings/tokens/new) inside the configuration.
+
+   ```sh
+   cp config.json.example config.json
+   ```
+
 ### Generate Dist-SSR
 
 1. Use release command, and it will generate `dist-ssr/` with a executable file
