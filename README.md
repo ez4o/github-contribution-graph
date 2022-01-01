@@ -151,7 +151,8 @@ these simple steps.
 ## Roadmap
 
 - [x] Customize Background Image
-- [ ] CSS Animation
+- [x] CSS Animation (actually, it's a SMIL animation lol)
+- [ ] New Parameter: `last_n_days`
 
 See the [open issues](https://github.com/ez4o/github-contribution-graph/issues)
 for a full list of proposed features (and known issues).

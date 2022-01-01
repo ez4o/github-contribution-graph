@@ -34,7 +34,7 @@ const startDateTextOffsetX = 31;
 
 const barOffsetX = 20;
 const barWidth = 28;
-const baseBarHeight = 10;
+const baseBarHeight = 6;
 
 const fontSize = '0.7em';
 const textWidth = 20;
@@ -65,7 +65,7 @@ const x = d3
 
 const y = d3
   .scaleLinear()
-  .range([margin + chartScaleMarginY, height - margin - chartScaleMarginY]);
+  .range([0, height - margin - chartScaleMarginY]);
 
 const endPoint = ((max: number) => {
   return (Math.ceil(max / 4) + 1) * 4;
@@ -86,9 +86,9 @@ svg
 const clipPath = svg
   .append("defs")
   .append("clipPath")
-  .attr("id", "clip")
+  .attr("id", "clip");
 
-clipPath
+const bars = clipPath
   .selectAll('bar')
   .data(hydratedContributionData)
   .enter()
@@ -100,6 +100,27 @@ clipPath
   .attr('height', d => y(d.amount) + baseBarHeight)
   .attr('fill', `rgba(0, 0, 0, 0.2)`)
   .attr('transform', `translate(${(x.bandwidth() - barWidth) / 2}, 0)`);
+
+bars
+  .each((d: ContributionEntry, i: number, n: SVGRectElement[] | d3.ArrayLike<SVGRectElement>) => {
+    const bar = d3.select(n[i]);
+
+    bar
+      .append('animate')
+      .attr('attributeName', 'height')
+      .attr('values', '0;' + (y(d.amount) + baseBarHeight))
+      .attr('dur', '1s')
+      .attr('calcMode', 'spline')
+      .attr('keySplines', '0.6 0 0.2 1')
+
+    bar
+      .append('animate')
+      .attr('attributeName', 'y')
+      .attr('values', height / 2 + ';' + (height / 2 - (y(d.amount) + baseBarHeight) / 2))
+      .attr('dur', '1s')
+      .attr('calcMode', 'spline')
+      .attr('keySplines', '0.6 0 0.2 1')
+  })
 
 svg
   .append('svg:image')
@@ -127,7 +148,7 @@ svg
 svg
   .append('text')
   .attr('x', width / 2 - margin - barOffsetX + startDateTextOffsetX - textMargin - textWidth / 2)
-  .attr('y', height / 2 - lineHeight / 2 + baseOffsetY)
+  .attr('y', height / 2 - lineHeight / 2 + baseOffsetY - baseBarHeight)
   .attr('fill', '#000')
   .attr('text-anchor', 'middle')
   .attr('font-size', fontSize)
@@ -136,7 +157,7 @@ svg
 svg
   .append('text')
   .attr('x', width / 2 - margin - barOffsetX + startDateTextOffsetX - textMargin - textWidth / 2)
-  .attr('y', height / 2 + lineHeight / 2 + baseOffsetY)
+  .attr('y', height / 2 + lineHeight / 2 + baseOffsetY - baseBarHeight)
   .attr('fill', '#000')
   .attr('text-anchor', 'middle')
   .attr('font-size', fontSize)
@@ -145,7 +166,7 @@ svg
 svg
   .append('text')
   .attr('x', width - margin * 2 - barOffsetX + textMargin + textWidth / 2)
-  .attr('y', height / 2 - lineHeight / 2 + baseOffsetY)
+  .attr('y', height / 2 - lineHeight / 2 + baseOffsetY - baseBarHeight)
   .attr('fill', '#000')
   .attr('text-anchor', 'middle')
   .attr('font-size', fontSize)
@@ -154,7 +175,7 @@ svg
 svg
   .append('text')
   .attr('x', width - margin * 2 - barOffsetX + textMargin + textWidth / 2)
-  .attr('y', height / 2 + lineHeight / 2 + baseOffsetY)
+  .attr('y', height / 2 + lineHeight / 2 + baseOffsetY - baseBarHeight)
   .attr('fill', '#000')
   .attr('text-anchor', 'middle')
   .attr('font-size', fontSize)
@@ -176,3 +197,17 @@ svg
   .attr('font-size', "2rem")
   .attr('font-weight', 'bold')
   .text(hydratedUsername);
+
+svg
+  .selectAll('text')
+  .each((_, i: number, n: d3.BaseType[] | d3.ArrayLike<d3.BaseType>) => {
+    const text = d3.select(n[i]);
+
+    text
+      .append('animate')
+      .attr('attributeName', 'opacity')
+      .attr('values', '0;1')
+      .attr('dur', '1s')
+      .attr('calcMode', 'spline')
+      .attr('keySplines', '0.6 0 0.2 1');
+  })

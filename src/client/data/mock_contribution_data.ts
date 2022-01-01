@@ -15,7 +15,7 @@ export const mockContributionData: ContributionEntry[] = [
     },
     {
         dateString: "2020-01-04",
-        amount: 14
+        amount: 0
     },
     {
         dateString: "2020-01-05",
