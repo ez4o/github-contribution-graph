@@ -35,9 +35,10 @@
       <a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#usage">Usage</a></li>
-        <li><a href="#deploy-your-own-server">Deploy Your Own Server</a></li>
+        <li><a href="#parameters">Parameters</a></li>
       </ul>
     </li>
+    <li><a href="#deploy-your-own-server">Deploy Your Own Server</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -201,9 +202,16 @@ for more information.
 
 ## Contact
 
-HSING-HAN, WU (Xyphuz) - xyphuzwu@gmail.com
+### Author
 
-Project Link: <https://github.com/ez4o/github-contribution-graph>
+- HSING-HAN, WU (Xyphuz)
+  - Mail me: xyphuzwu@gmail.com
+  - About me: <https://about.xyphuz.com>
+  - Github: <https://github.com/wst24365888>
+
+### Project Link
+
+- <https://github.com/ez4o/github-contribution-graph>
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
