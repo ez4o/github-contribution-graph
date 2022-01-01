@@ -227,7 +227,5 @@ for more information.
 [issues-shield]: https://img.shields.io/github/issues/ez4o/github-contribution-graph.svg?style=for-the-badge
 [issues-url]: https://github.com/ez4o/github-contribution-graph/issues
 [license-shield]: https://img.shields.io/github/license/ez4o/github-contribution-graph.svg?style=for-the-badge
-[license-url]: https://github.com/ez4o/github-contribution-graph/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/othneildrew
+[license-url]: https://github.com/ez4o/github-contribution-graph/blob/main/LICENSE
 [product-screenshot]: https://github-contribution-graph.ez4o.com/?username=wst24365888&img_url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1506744038136-46273834b3fb%3Fixid%3DMnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8%26ixlib%3Drb-1.2.1%26auto%3Dformat%26fit%3Dcrop%26w%3D1000%26q%3D80&fbclid=IwAR1AUDKHzjzBSjKle6J44dYRSrIbvBu8eTxtrfhpPxhBnBsOizgSq63bYbU
