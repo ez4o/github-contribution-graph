@@ -10,24 +10,27 @@ let hydratedUsername: string;
 let hydratedImgBase64String: string;
 
 if (DEBUG) {
+  hydratedContributionData = mockContributionData;
+  hydratedUsername = 'Xyphuz';
+  hydratedImgBase64String = mockImgBase64String;
+} else {
   // @ts-ignore
   hydratedContributionData = contributionData as unknown as ContributionEntry[];
   // @ts-ignore
   hydratedUsername = username;
   // @ts-ignore
   hydratedImgBase64String = imgBase64String;
-} else {
-  hydratedContributionData = mockContributionData;
-  hydratedUsername = 'Xyphuz';
-  hydratedImgBase64String = mockImgBase64String
 }
 
 const width = 640
 const height = 640
 
 const margin = 35;
+const chartScaleMarginX = 35;
+const chartScaleMarginY = 0;
+
 const textMargin = 10;
-const chartMargin = 25;
+const startDateTextOffsetX = 31;
 
 const barOffsetX = 20;
 const barWidth = 28;
@@ -58,11 +61,11 @@ svg
 
 const x = d3
   .scaleBand()
-  .range([width / 2 - margin - barOffsetX + chartMargin, width - margin * 2 - barOffsetX]);
+  .range([width / 2 - margin - barOffsetX + chartScaleMarginX, width - margin - barOffsetX - chartScaleMarginX]);
 
 const y = d3
   .scaleLinear()
-  .range([height / 2, 0]);
+  .range([margin + chartScaleMarginY, height - margin - chartScaleMarginY]);
 
 const endPoint = ((max: number) => {
   return (Math.ceil(max / 4) + 1) * 4;
@@ -92,9 +95,9 @@ clipPath
   .append('rect')
   .attr('class', 'bar')
   .attr('x', d => x(d.dateString)!)
-  .attr('y', d => height / 2 + ((height / 2 - y(d.amount)) * 2 + baseBarHeight) / 2)
+  .attr('y', d => height / 2 - (y(d.amount) + baseBarHeight) / 2)
   .attr('width', barWidth)
-  .attr('height', d => y(d.amount) * 2 + baseBarHeight)
+  .attr('height', d => y(d.amount) + baseBarHeight)
   .attr('fill', `rgba(0, 0, 0, 0.2)`)
   .attr('transform', `translate(${(x.bandwidth() - barWidth) / 2}, 0)`);
 
@@ -112,7 +115,7 @@ svg
   .enter()
   .append('text')
   .attr('x', d => x(d.dateString)! + barWidth / 2)
-  .attr('y', d => y(d.amount) - lineHeight / 2)
+  .attr('y', d => height / 2 - (y(d.amount) + baseBarHeight) / 2 - lineHeight / 2)
   .attr('width', barWidth)
   .attr('height', d => height / 2 - y(d.amount))
   .attr('fill', '#000')
@@ -123,7 +126,7 @@ svg
 
 svg
   .append('text')
-  .attr('x', width / 2 - margin - barOffsetX + chartMargin - textMargin - textWidth / 2 - 4)
+  .attr('x', width / 2 - margin - barOffsetX + startDateTextOffsetX - textMargin - textWidth / 2)
   .attr('y', height / 2 - lineHeight / 2 + baseOffsetY)
   .attr('fill', '#000')
   .attr('text-anchor', 'middle')
@@ -132,7 +135,7 @@ svg
 
 svg
   .append('text')
-  .attr('x', width / 2 - margin - barOffsetX + chartMargin - textMargin - textWidth / 2 - 4)
+  .attr('x', width / 2 - margin - barOffsetX + startDateTextOffsetX - textMargin - textWidth / 2)
   .attr('y', height / 2 + lineHeight / 2 + baseOffsetY)
   .attr('fill', '#000')
   .attr('text-anchor', 'middle')
