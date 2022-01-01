@@ -1,2 +1,2 @@
 *.html linguist-vendored
-src/client/data/ linguist-vendored
+src/client/data/*.ts linguist-vendored
