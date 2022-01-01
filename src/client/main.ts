@@ -1,17 +1,26 @@
 import * as d3 from "d3";
 import { ContributionEntry } from './model/contribution_entry';
-// import { mockContributionData } from './data/mock_contribution_data';
+import { mockContributionData } from './data/mock_contribution_data';
+import { mockImgBase64String } from "./data/mock_img_base64_string";
 
-// @ts-ignore
-const hydratedContributionData = contributionData as unknown as ContributionEntry[];
-// const hydratedContributionData: ContributionEntry[] = mockContributionData;
+const DEBUG = false;
 
-// @ts-ignore
-const hydratedUsername = username;
-// const hydratedUsername = 'Xyphuz';
+let hydratedContributionData: ContributionEntry[];
+let hydratedUsername: string;
+let hydratedImgBase64String: string;
 
-// @ts-ignore
-const hydratedImgBase64String = imgBase64String;
+if (DEBUG) {
+  // @ts-ignore
+  hydratedContributionData = contributionData as unknown as ContributionEntry[];
+  // @ts-ignore
+  hydratedUsername = username;
+  // @ts-ignore
+  hydratedImgBase64String = imgBase64String;
+} else {
+  hydratedContributionData = mockContributionData;
+  hydratedUsername = 'Xyphuz';
+  hydratedImgBase64String = mockImgBase64String
+}
 
 const width = 640
 const height = 640
@@ -77,28 +86,15 @@ const clipPath = svg
   .attr("id", "clip")
 
 clipPath
-  .selectAll('upper-bar')
-  .data(hydratedContributionData)
-  .enter()
-  .append('rect')
-  .attr('class', 'bar')
-  .attr("clip-path", "url(#chart-background)")
-  .attr('x', d => x(d.dateString)!)
-  .attr('y', d => y(d.amount) - baseBarHeight / 2)
-  .attr('width', barWidth)
-  .attr('height', d => height / 2 - y(d.amount) + baseBarHeight)
-  .attr('transform', `translate(${(x.bandwidth() - barWidth) / 2}, 0)`);
-
-clipPath
-  .selectAll('lower-bar')
+  .selectAll('bar')
   .data(hydratedContributionData)
   .enter()
   .append('rect')
   .attr('class', 'bar')
   .attr('x', d => x(d.dateString)!)
-  .attr('y', height / 2 + baseBarHeight / 2)
+  .attr('y', d => height / 2 + ((height / 2 - y(d.amount)) * 2 + baseBarHeight) / 2)
   .attr('width', barWidth)
-  .attr('height', d => height / 2 - y(d.amount) + baseBarHeight)
+  .attr('height', d => y(d.amount) * 2 + baseBarHeight)
   .attr('fill', `rgba(0, 0, 0, 0.2)`)
   .attr('transform', `translate(${(x.bandwidth() - barWidth) / 2}, 0)`);
 
