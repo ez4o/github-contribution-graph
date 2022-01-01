@@ -1,1 +1,2 @@
 *.html linguist-vendored
+src/client/data linguist-vendored
