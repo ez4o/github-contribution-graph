@@ -11,7 +11,7 @@
 
 <br />
 
-![github-contribution-graph](https://socialify.git.ci/ez4o/github-contribution-graph/image?description=1&font=KoHo&owner=1&pattern=Circuit%20Board&theme=Light)
+![github-contribution-graph](https://socialify.git.ci/ez4o/github-contribution-graph/image?description=1&font=KoHo&name=1&owner=1&pattern=Circuit%20Board&theme=Light)
 
 <!-- PROJECT LOGO -->
 <br />
