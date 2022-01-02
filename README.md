@@ -70,7 +70,7 @@ website.
 
 ### Usage
 
-`https://github-contribution-graph.ez4o.com/?username=[YOUR_GITHUB_USERNAME]&img_url=[ENCODED_IMAGE_URL]`
+`https://github-contribution-graph.ez4o.com/?username=[YOUR_GITHUB_USERNAME]&last_n_days=[DAYS_YOU_WANT_TO_SHOW]&img_url=[ENCODED_IMAGE_URL]`
 
 #### Example
 
@@ -81,8 +81,8 @@ website.
 | Parameter     | Necessity | Description                                                               | Default Value |
 | ------------- | --------- | ------------------------------------------------------------------------- | ------------- |
 | `username`    | Required  | Your GitHub username.                                                     | None          |
-| `img_url`     | Optional  | Background image. Use url encode tool like <https://www.urlencoder.org/>. | A Cat Image   |
 | `last_n_days` | Optional  | The n days to show on the chart. **0 < n < 365**                          | 7             |
+| `img_url`     | Optional  | Background image. Use url encode tool like <https://www.urlencoder.org/>. | A Cat Image   |
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
