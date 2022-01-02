@@ -30,14 +30,14 @@ const chartScaleMarginX = 35;
 const chartScaleMarginY = 0;
 
 const textMargin = 10;
-const startDateTextOffsetX = 31;
+const startDateTextOffsetX = 21;
+const endDateTextOffsetX = 10;
 
 const barOffsetX = 20;
-const barWidth = 28;
+const barWidth = 196 / hydratedContributionData.length;
 const baseBarHeight = 6;
 
 const fontSize = '0.7em';
-const textWidth = 20;
 const baseOffsetY = 8;
 const lineHeight = 20;
 const titleLineHeight = 40;
@@ -135,19 +135,19 @@ svg
   .data(hydratedContributionData)
   .enter()
   .append('text')
-  .attr('x', d => x(d.dateString)! + barWidth / 2)
+  .attr('x', d => x(d.dateString)!)
   .attr('y', d => height / 2 - (y(d.amount) + baseBarHeight) / 2 - lineHeight / 2)
   .attr('width', barWidth)
   .attr('height', d => height / 2 - y(d.amount))
   .attr('fill', '#000')
-  .attr('transform', `translate(${(x.bandwidth() - barWidth) / 2}, 0)`)
+  .attr('transform', `translate(${x.bandwidth() / 2}, 0)`)
   .attr('text-anchor', 'middle')
   .attr('font-size', fontSize)
   .text(d => d.amount);
 
 svg
   .append('text')
-  .attr('x', width / 2 - margin - barOffsetX + startDateTextOffsetX - textMargin - textWidth / 2)
+  .attr('x', width / 2 - margin - barOffsetX + startDateTextOffsetX - textMargin)
   .attr('y', height / 2 - lineHeight / 2 + baseOffsetY - baseBarHeight)
   .attr('fill', '#000')
   .attr('text-anchor', 'middle')
@@ -156,7 +156,7 @@ svg
 
 svg
   .append('text')
-  .attr('x', width / 2 - margin - barOffsetX + startDateTextOffsetX - textMargin - textWidth / 2)
+  .attr('x', width / 2 - margin - barOffsetX + startDateTextOffsetX - textMargin)
   .attr('y', height / 2 + lineHeight / 2 + baseOffsetY - baseBarHeight)
   .attr('fill', '#000')
   .attr('text-anchor', 'middle')
@@ -165,7 +165,7 @@ svg
 
 svg
   .append('text')
-  .attr('x', width - margin * 2 - barOffsetX + textMargin + textWidth / 2)
+  .attr('x', width - margin * 2 - barOffsetX + textMargin + endDateTextOffsetX)
   .attr('y', height / 2 - lineHeight / 2 + baseOffsetY - baseBarHeight)
   .attr('fill', '#000')
   .attr('text-anchor', 'middle')
@@ -174,7 +174,7 @@ svg
 
 svg
   .append('text')
-  .attr('x', width - margin * 2 - barOffsetX + textMargin + textWidth / 2)
+  .attr('x', width - margin * 2 - barOffsetX + textMargin + endDateTextOffsetX)
   .attr('y', height / 2 + lineHeight / 2 + baseOffsetY - baseBarHeight)
   .attr('fill', '#000')
   .attr('text-anchor', 'middle')
