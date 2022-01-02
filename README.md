@@ -9,15 +9,15 @@
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]</div>][license-url]
 
+<br />
+
+![<div align="center"> github-contribution-graph </div>](https://socialify.git.ci/ez4o/github-contribution-graph/image?description=1&font=KoHo&owner=1&pattern=Circuit%20Board&theme=Light)
+
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <h3 align="center">GitHub-Contribution-Graph</h3>
-
 <p align="center">
-    Add GitHub contribution/commit graph to your profile README!
-    <br />
-    <a href="https://github.com/ez4o/github-contribution-graph#usage"><strong>Explore Usage »</strong></a>
+  <strong>Explore Usage »</strong></a>
     <br />
     <br />
     <a href="https://github.com/ez4o/github-contribution-graph/issues">Report Bug</a>
