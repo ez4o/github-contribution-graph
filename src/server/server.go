@@ -39,7 +39,7 @@ func (s *Server) handleRender(w http.ResponseWriter, r *http.Request) {
 		params.ImgUrl = imgUrl
 	}
 
-	contributiondata, username, err := util.GetContributionData(w, params.Username, s.GitHubToken)
+	contributiondata, username, err := util.GetContributionData(w, params.Username, s.GitHubToken, params.LastNDays)
 	if err != nil {
 		fmt.Fprintln(w, "Error while parsing response from GitHub, please check all your request parameters.")
 

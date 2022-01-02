@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func GetContributionData(w http.ResponseWriter, id string, githubToken string) ([]model.ContributionEntry, string, error) {
+func GetContributionData(w http.ResponseWriter, id string, githubToken string, lastNDays int) ([]model.ContributionEntry, string, error) {
 	var requestBody bytes.Buffer
 
 	requestBodyObj := struct {
@@ -76,7 +76,7 @@ func GetContributionData(w http.ResponseWriter, id string, githubToken string) (
 		return nil, "", err
 	}
 
-	t, err := result.GetContributionOfLastSevenDays()
+	t, err := result.GetContributionOfLastNDays(lastNDays)
 	if err != nil {
 		return nil, "", err
 	}

@@ -37,7 +37,12 @@ const barOffsetX = 20;
 const barWidth = 196 / hydratedContributionData.length;
 const baseBarHeight = 6;
 
-const fontSize = '0.7em';
+let amountFontSize = '0.7em';
+if(hydratedContributionData.length > 15) {
+  amountFontSize = `${10.5 / hydratedContributionData.length}em`;
+}
+
+const dateFontSize = '0.7em';
 const baseOffsetY = 8;
 const lineHeight = 20;
 const titleLineHeight = 40;
@@ -142,7 +147,7 @@ svg
   .attr('fill', '#000')
   .attr('transform', `translate(${x.bandwidth() / 2}, 0)`)
   .attr('text-anchor', 'middle')
-  .attr('font-size', fontSize)
+  .attr('font-size', amountFontSize)
   .text(d => d.amount);
 
 svg
@@ -151,7 +156,7 @@ svg
   .attr('y', height / 2 - lineHeight / 2 + baseOffsetY - baseBarHeight)
   .attr('fill', '#000')
   .attr('text-anchor', 'middle')
-  .attr('font-size', fontSize)
+  .attr('font-size', dateFontSize)
   .text(hydratedContributionData[0].dateString.substring(0, 4));
 
 svg
@@ -160,7 +165,7 @@ svg
   .attr('y', height / 2 + lineHeight / 2 + baseOffsetY - baseBarHeight)
   .attr('fill', '#000')
   .attr('text-anchor', 'middle')
-  .attr('font-size', fontSize)
+  .attr('font-size', dateFontSize)
   .text(hydratedContributionData[0].dateString.substring(5, 10));
 
 svg
@@ -169,7 +174,7 @@ svg
   .attr('y', height / 2 - lineHeight / 2 + baseOffsetY - baseBarHeight)
   .attr('fill', '#000')
   .attr('text-anchor', 'middle')
-  .attr('font-size', fontSize)
+  .attr('font-size', dateFontSize)
   .text(hydratedContributionData[hydratedContributionData.length - 1].dateString.substring(0, 4));
 
 svg
@@ -178,7 +183,7 @@ svg
   .attr('y', height / 2 + lineHeight / 2 + baseOffsetY - baseBarHeight)
   .attr('fill', '#000')
   .attr('text-anchor', 'middle')
-  .attr('font-size', fontSize)
+  .attr('font-size', dateFontSize)
   .text(hydratedContributionData[hydratedContributionData.length - 1].dateString.substring(5, 10));
 
 svg
@@ -186,7 +191,7 @@ svg
   .attr('x', titleX)
   .attr('y', titleY)
   .attr('fill', '#666')
-  .attr('font-size', fontSize)
+  .attr('font-size', dateFontSize)
   .text('Contribution Graph of');
 
 svg

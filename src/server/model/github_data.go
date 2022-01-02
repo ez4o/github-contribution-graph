@@ -1,6 +1,9 @@
 package model
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 type GitHubData struct {
 	Data struct {
@@ -18,18 +21,19 @@ type GitHubData struct {
 	} `json:"data"`
 }
 
-func (g *GitHubData) GetContributionOfLastSevenDays() ([]ContributionEntry, error) {
+func (g *GitHubData) GetContributionOfLastNDays(lastNDays int) ([]ContributionEntry, error) {
 	weeks := g.Data.User.ContributionsCollection.ContributionCalendar.Weeks
 	weekLength := len(g.Data.User.ContributionsCollection.ContributionCalendar.Weeks)
+	nWeek := math.Ceil(float64(lastNDays)/float64(7)) + 1
 
-	if weekLength < 2 {
-		return nil, fmt.Errorf("No data available")
+	if float64(weekLength) < nWeek {
+		return nil, fmt.Errorf("Data is not enough to get last %d days", lastNDays)
 	}
 
 	var contributionOfLastTwoWeeks []ContributionEntry
-	lastTwoWeeks := weeks[weekLength-2:]
+	lastNWeeks := weeks[weekLength-int(nWeek):]
 
-	for _, week := range lastTwoWeeks {
+	for _, week := range lastNWeeks {
 		for _, day := range week.ContributionDays {
 			if day.Date == "" {
 				continue
@@ -39,7 +43,7 @@ func (g *GitHubData) GetContributionOfLastSevenDays() ([]ContributionEntry, erro
 		}
 	}
 
-	return contributionOfLastTwoWeeks[len(contributionOfLastTwoWeeks)-7:], nil
+	return contributionOfLastTwoWeeks[len(contributionOfLastTwoWeeks)-lastNDays:], nil
 }
 
 type ContributionDays struct {

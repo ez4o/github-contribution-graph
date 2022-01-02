@@ -53,7 +53,7 @@
 
 ![screenshot][product-screenshot]
 
-GitHub-Contribution-Graph is an awesome tool for dynamically generated
+**GitHub-Contribution-Graph** is an awesome tool for dynamically generated
 contribution graphs that show your GitHub contributions for the last 7 days.
 
 It can be used anywhere, you can download the image, share the link, or paste
@@ -78,10 +78,11 @@ website.
 
 ### Parameters
 
-| Parameter  | Necessity | Description                                                               |
-| ---------- | --------- | ------------------------------------------------------------------------- |
-| `username` | Required  | Your GitHub username.                                                     |
-| `img_url`  | Optional  | Background image. Use url encode tool like <https://www.urlencoder.org/>. |
+| Parameter     | Necessity | Description                                                               | Default Value |
+| ------------- | --------- | ------------------------------------------------------------------------- | ------------- |
+| `username`    | Required  | Your GitHub username.                                                     | None          |
+| `img_url`     | Optional  | Background image. Use url encode tool like <https://www.urlencoder.org/>. | A Cat Image   |
+| `last_n_days` | Optional  | The n days to show on the chart. **0 < n < 365**                          | 7             |
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -119,7 +120,8 @@ these simple steps.
    go get -u
    ```
 
-4. Fill in the [GitHub token](https://github.com/settings/tokens/new) inside the configuration.
+4. Fill in the [GitHub token](https://github.com/settings/tokens/new) inside the
+   configuration.
 
    ```sh
    cp config.json.example config.json
@@ -152,7 +154,8 @@ these simple steps.
 
 - [x] Customize Background Image
 - [x] CSS Animation (actually, it's a SMIL animation lol)
-- [ ] New Parameter: `last_n_days`
+- [x] New Parameter: `last_n_days`
+- [ ] More Patameters...
 
 See the [open issues](https://github.com/ez4o/github-contribution-graph/issues)
 for a full list of proposed features (and known issues).
