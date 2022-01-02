@@ -39,7 +39,12 @@ const baseBarHeight = 6;
 
 let amountFontSize = '0.7em';
 if(hydratedContributionData.length > 15) {
-  amountFontSize = `${10.5 / hydratedContributionData.length}em`;
+  let fontSize = 10.5 / hydratedContributionData.length;
+  if (fontSize < 0.4) {
+    fontSize = 0
+  }
+
+  amountFontSize = `${fontSize}em`;
 }
 
 const dateFontSize = '0.7em';
@@ -54,7 +59,9 @@ const svg = d3
   .select('#svg-container')
   .append('svg')
   .attr('width', width)
-  .attr('height', height);
+  .attr('height', height)
+  .attr('cursor', 'pointer')
+  .attr('onclick', "window.open('https://github.com/ez4o/github-contribution-graph', '_blank');");
 
 svg
   .append('svg:image')
