@@ -9,6 +9,8 @@
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]</div>][license-url]
 
+<br />
+
 ![github-contribution-graph](https://socialify.git.ci/ez4o/github-contribution-graph/image?description=1&font=KoHo&owner=1&pattern=Circuit%20Board&theme=Light)
 
 <!-- PROJECT LOGO -->
