@@ -74,10 +74,6 @@ website.
 
 `https://github-contribution-graph.ez4o.com/?username=[YOUR_GITHUB_USERNAME]&last_n_days=[DAYS_YOU_WANT_TO_SHOW]&img_url=[ENCODED_IMAGE_URL]`
 
-#### Example
-
-`https://github-contribution-graph.ez4o.com/?username=wst24365888&img_url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1506744038136-46273834b3fb%3Fixid%3DMnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8%26ixlib%3Drb-1.2.1%26auto%3Dformat%26fit%3Dcrop%26w%3D1000%26q%3D80`
-
 ### Parameters
 
 | Parameter     | Necessity | Description                                                               | Default Value |
@@ -85,6 +81,23 @@ website.
 | `username`    | Required  | Your GitHub username.                                                     | None          |
 | `last_n_days` | Optional  | The n days to show on the chart. **0 < n < 365**                          | 7             |
 | `img_url`     | Optional  | Background image. Use url encode tool like <https://www.urlencoder.org/>. | A Cat Image   |
+
+### Example
+
+Assume we want:
+
+- username = `wst24365888`
+- last_n_days = `10`
+- img_url = `https://image.cache.storm.mg/media/image/2021/03/05/20210305-031458_U22011_M676060_ca39.gif` 
+  > Remember to encoded it: `https%3A%2F%2Fimage.cache.storm.mg%2Fmedia%2Fimage%2F2021%2F03%2F05%2F20210305-031458_U22011_M676060_ca39.gif`
+
+Then, we get:
+
+- `https://github-contribution-graph.ez4o.com/?username=wst24365888&last_n_days=10&img_url=https%3A%2F%2Fimage.cache.storm.mg%2Fmedia%2Fimage%2F2021%2F03%2F05%2F20210305-031458_U22011_M676060_ca39.gif`
+
+And yeah! **GitHub-Contribution-Graph** actually supports gif!
+
+![gif-example](https://github-contribution-graph.ez4o.com/?username=wst24365888&last_n_days=10&img_url=https%3A%2F%2Fimage.cache.storm.mg%2Fmedia%2Fimage%2F2021%2F03%2F05%2F20210305-031458_U22011_M676060_ca39.gif)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
