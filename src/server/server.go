@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"html/template"
 	"log"
-	"net"
 	"net/http"
 	"net/url"
 	"path"
@@ -27,6 +26,9 @@ func (s *Server) handleRender(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+
+	log.Println("New render request.")
+	log.Printf("username=%s\n", params.Username)
 
 	if params.ImgUrl == "" {
 		params.ImgUrl = "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
@@ -84,17 +86,7 @@ func (s *Server) handleRender(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleSVG(w http.ResponseWriter, r *http.Request, b *rod.Browser) {
-	if r.URL.Query().Encode() == "" {
-		ip, _, err := net.SplitHostPort(r.RemoteAddr)
-		if err != nil {
-			log.Println("Error while parsing IP:", err)
-		}
-
-		// To check weird IPs.
-		log.Println("(No Query Params) from IP:", ip)
-	} else {
-		log.Println(r.URL.Query().Encode())
-	}
+	log.Println("New SVG request.")
 
 	page := b.MustPage(fmt.Sprintf("http://localhost:8687/?%s", r.URL.Query().Encode()))
 	defer page.Close()
