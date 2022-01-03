@@ -89,7 +89,7 @@ Assume we want:
 - username = `wst24365888`
 - last_n_days = `10`
 - img_url = `https://image.cache.storm.mg/media/image/2021/03/05/20210305-031458_U22011_M676060_ca39.gif`
-  <br />
+  <div style="height: 24px;"></div>
   > Remember to encoded it: `https%3A%2F%2Fimage.cache.storm.mg%2Fmedia%2Fimage%2F2021%2F03%2F05%2F20210305-031458_U22011_M676060_ca39.gif`
 
 Then, we get:
