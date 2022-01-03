@@ -52,14 +52,16 @@ func (s *Server) handleRender(w http.ResponseWriter, r *http.Request) {
 
 	imgBase64String, err := util.GetBase64FromImgUrl(params.ImgUrl)
 	if err != nil {
-		fmt.Fprintln(w, "Error while parsing image, please check all your request parameters.")
+		fmt.Fprintln(w, "Error while parsing image:", err.Error())
 
 		return
 	}
 
-	imgType, err := util.GetImgTypeFromBase64(imgBase64String)
+	imgType, err := util.GetImgTypeFromBase64(imgBase64String[0])
 	if err != nil {
 		fmt.Fprintln(w, "Error while parsing image:", err.Error())
+
+		return
 	}
 
 	tmpl, err := template.New("index.html").Funcs(

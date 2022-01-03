@@ -2,8 +2,8 @@ package util
 
 import "fmt"
 
-func GetImgTypeFromBase64(base64String string) (string, error) {
-	switch base64String[0] {
+func GetImgTypeFromBase64(base64Head byte) (string, error) {
+	switch base64Head {
 	case '/':
 		return "image/jpeg", nil
 	case 'i':
