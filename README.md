@@ -136,7 +136,7 @@ these simple steps.
    go get -u
    ```
 
-   > Go module act really different between versions, if you have any problem installing Go modules, please try:
+   > **Go module** acts really different between versions, if you have any problem installing Go modules, please try:
    > 1. Upgrade Go version to `1.17.x`
    > 2. `go mod tidy -compat="1.17"`
    > 3. `go get -u`
