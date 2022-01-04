@@ -55,7 +55,7 @@
 
 ![screenshot][product-screenshot]
 
-**GitHub-Contribution-Graph** is an awesome tool for dynamically generated
+**GitHub-Contribution-Graph** is an awesome tool for dynamically generating
 contribution graphs that show your GitHub contributions.
 
 It can be used anywhere, you can download the image, share the link, or paste
