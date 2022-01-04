@@ -90,7 +90,7 @@ Assume we want:
 - last_n_days = `10`
 - img_url = `https://image.cache.storm.mg/media/image/2021/03/05/20210305-031458_U22011_M676060_ca39.gif`
 
-  > Remember to encoded it: `https%3A%2F%2Fimage.cache.storm.mg%2Fmedia%2Fimage%2F2021%2F03%2F05%2F20210305-031458_U22011_M676060_ca39.gif`
+  > Remember to encode it: `https%3A%2F%2Fimage.cache.storm.mg%2Fmedia%2Fimage%2F2021%2F03%2F05%2F20210305-031458_U22011_M676060_ca39.gif`
 
 Then, we get:
 
@@ -130,11 +130,16 @@ these simple steps.
    npm i
    ```
 
-3. Install Go packages.
+3. Install Go modules.
 
    ```sh
    go get -u
    ```
+
+   > Go module act really different between versions, if you have any problem installing Go modules, please try:
+   > 1. Upgrade Go version to `1.17.x`
+   > 2. `go mod tidy -compat="1.17"`
+   > 3. `go get -u`
 
 4. Fill in the [GitHub token](https://github.com/settings/tokens/new) inside the
    configuration.
@@ -227,7 +232,7 @@ for more information.
 - HSING-HAN, WU (Xyphuz)
   - Mail me: xyphuzwu@gmail.com
   - About me: <https://about.xyphuz.com>
-  - Github: <https://github.com/wst24365888>
+  - GitHub: <https://github.com/wst24365888>
 
 ### Project Link
 
