@@ -3,12 +3,13 @@
 <!-- PROJECT SHIELDS -->
 
 [<div align="center"> ![Contributors][contributors-shield]][contributors-url]
-<!-- ![Visitors](https://estruyf-github.azurewebsites.net/api/VisitorHit?user=wst24365888&repo=ez4o/github-contribution-graph&countColor=rgb(0,%20126,%20198)) -->
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![MIT License][license-shield]][license-url]
 [![Issues][issues-shield]][issues-url]
 [![Issues Closed][issues-closed-shield]</div>][issues-closed-url]
+
+<!-- ![Visitors](https://estruyf-github.azurewebsites.net/api/VisitorHit?user=wst24365888&repo=ez4o/github-contribution-graph&countColor=rgb(0,%20126,%20198)) -->
 
 <br />
 
