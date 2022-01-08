@@ -98,6 +98,7 @@ func (s *Server) handleSVG(w http.ResponseWriter, r *http.Request, b *rod.Browse
 		pre := page.MustElement("pre")
 
 		w.Header().Set("Content-Type", "text/plain")
+		w.Header().Set("Cache-Control", "no-store, max-age=0")
 		w.WriteHeader(http.StatusInternalServerError)
 
 		fmt.Fprintln(w, pre.MustText())
