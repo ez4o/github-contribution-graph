@@ -1,9 +1,11 @@
 module server
 
-go 1.17
+go 1.18
 
-require model v0.0.0
-require util v0.0.0
+require github.com/go-rod/rod v0.104.1
 
-replace model => ./model
-replace util => ./util
+require (
+	github.com/ysmood/goob v0.3.1 // indirect
+	github.com/ysmood/gson v0.6.4 // indirect
+	github.com/ysmood/leakless v0.7.0 // indirect
+)

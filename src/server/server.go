@@ -111,6 +111,7 @@ func (s *Server) handleSVG(w http.ResponseWriter, r *http.Request, b *rod.Browse
 		w.WriteHeader(http.StatusOK)
 
 		fmt.Fprintln(w, svg.MustHTML())
+		w.(http.Flusher).Flush()
 	}
 }
 
