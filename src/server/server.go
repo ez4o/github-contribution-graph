@@ -8,11 +8,11 @@ import (
 	"net/url"
 	"path"
 
-	"github.com/go-rod/rod"
-	"github.com/go-rod/rod/lib/launcher"
-
 	"server/model"
 	"server/util"
+
+	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/launcher"
 )
 
 type Server struct {
