@@ -1,5 +1,7 @@
 github.com/go-rod/rod v0.104.1 h1:CmFVu210HxSFOrmqX7/yLYIOF3pNm1SN9it+pQbi4ls=
 github.com/go-rod/rod v0.104.1/go.mod h1:SVRIBdiq0sXXDdQxISmWuY8g1kLIUT+Pgk4VZSbOM1s=
+github.com/patrickmn/go-cache v2.1.0+incompatible h1:HRMgzkcYKYpi3C8ajMPV8OFXaaRUnok+kx1WdO15EQc=
+github.com/patrickmn/go-cache v2.1.0+incompatible/go.mod h1:3Qf8kWWT7OJRJbdiICTKqZju1ZixQ/KpMGzzAfe6+WQ=
 github.com/ysmood/goob v0.3.1 h1:qMp5364BGS1DLJVrAqUxTF6KOFt0YDot8GC70u/0jbI=
 github.com/ysmood/goob v0.3.1/go.mod h1:S3lq113Y91y1UBf1wj1pFOxeahvfKkCk6mTWTWbDdWs=
 github.com/ysmood/got v0.16.2 h1:uedkfJYynagDxD2YfW6b7AySAVeh2IwchTwmqUGSREs=
