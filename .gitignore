@@ -5,3 +5,4 @@ dist-ssr
 *.local
 config.json
 log.txt
+.vscode/
