@@ -7,15 +7,18 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"time"
 
 	"server/model"
 	"server/util"
 
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
+	"github.com/patrickmn/go-cache"
 )
 
 type Server struct {
+	c           *cache.Cache
 	GitHubToken string
 }
 
@@ -43,14 +46,14 @@ func (s *Server) handleRender(w http.ResponseWriter, r *http.Request) {
 		params.ImgUrl = imgUrl
 	}
 
-	contributiondata, username, err := util.GetContributionData(w, params.Username, s.GitHubToken, params.LastNDays)
+	contributiondata, username, err := util.GetContributionData(s.c, params.Username, s.GitHubToken, params.LastNDays)
 	if err != nil {
 		fmt.Fprintln(w, "Error while parsing response from GitHub, please check all your request parameters.")
 
 		return
 	}
 
-	imgBase64String, err := util.GetBase64FromImgUrl(params.ImgUrl)
+	imgBase64String, err := util.GetBase64FromImgUrl(s.c, params.ImgUrl)
 	if err != nil {
 		fmt.Fprintln(w, "Error while parsing image:", err.Error())
 
@@ -88,6 +91,21 @@ func (s *Server) handleRender(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleSVG(w http.ResponseWriter, r *http.Request, b *rod.Browser) {
+	if svgContent, found := s.c.Get("cachedSvgContent:" + r.URL.Query().Encode()); found {
+		log.Println("SVG found in cache.")
+
+		w.Header().Set("Content-Type", "image/svg+xml; charset=utf-8")
+		w.Header().Set("Cache-Control", "public, max-age=600")
+		w.Header().Set("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval'")
+		w.WriteHeader(http.StatusOK)
+
+		fmt.Fprintln(w, svgContent.(string))
+
+		w.(http.Flusher).Flush()
+
+		return
+	}
+
 	log.Println("New SVG request.")
 
 	page := b.MustPage(fmt.Sprintf("http://localhost:8687/?%s", r.URL.Query().Encode()))
@@ -104,18 +122,23 @@ func (s *Server) handleSVG(w http.ResponseWriter, r *http.Request, b *rod.Browse
 		fmt.Fprintln(w, pre.MustText())
 	} else {
 		svg := page.MustElement("#svg-container")
+		svgContent := svg.MustHTML()
 
 		w.Header().Set("Content-Type", "image/svg+xml; charset=utf-8")
 		w.Header().Set("Cache-Control", "public, max-age=600")
 		w.Header().Set("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval'")
 		w.WriteHeader(http.StatusOK)
 
-		fmt.Fprintln(w, svg.MustHTML())
+		s.c.Set("cachedSvgContent:"+r.URL.Query().Encode(), svgContent, cache.DefaultExpiration)
+
+		fmt.Fprintln(w, svgContent)
 		w.(http.Flusher).Flush()
 	}
 }
 
 func (s *Server) Start() {
+	s.c = cache.New(30*time.Minute, 30*time.Minute)
+
 	ssrServer := http.NewServeMux()
 	ssrServer.HandleFunc("/", s.handleRender)
 	go http.ListenAndServe(":8687", ssrServer)
