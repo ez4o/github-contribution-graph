@@ -27,7 +27,7 @@ func (g *GitHubData) GetContributionOfLastNDays(lastNDays int) ([]ContributionEn
 	nWeek := math.Ceil(float64(lastNDays)/float64(7)) + 1
 
 	if float64(weekLength) < nWeek {
-		return nil, fmt.Errorf("Data is not enough to get last %d days", lastNDays)
+		return nil, fmt.Errorf("data is not enough to get last %d days", lastNDays)
 	}
 
 	var contributionOfLastTwoWeeks []ContributionEntry
