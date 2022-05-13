@@ -3,38 +3,35 @@ package util
 import (
 	"io/ioutil"
 	"os"
+	"os/exec"
 
 	"github.com/google/uuid"
-	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
 
 func ConvertImgToWebp(buf []byte) ([]byte, error) {
 	uuid := uuid.New().String()
 
-	err := ioutil.WriteFile("./"+uuid, buf, 0644)
+	i := "./temp/" + uuid
+	o := "./temp/" + uuid + ".webp"
+
+	err := ioutil.WriteFile(i, buf, 0644)
 	if err != nil {
 		return nil, err
 	}
 
-	err = ffmpeg.
-		Input("./temp/"+uuid).
-		Output("./temp/"+uuid+".webp", ffmpeg.KwArgs{
-			"c:v": "libwebp",
-			"crf": "51",
-		}).
-		Run()
+	err = exec.Command("ffmpeg", "-i", i, "-c:v", "libwebp", "-crf", "51", o).Run()
 
 	if err != nil {
 		return nil, err
 	}
 
-	buf, err = ioutil.ReadFile("./" + uuid + ".webp")
+	buf, err = ioutil.ReadFile(o)
 	if err != nil {
 		return nil, err
 	}
 
-	os.Remove("./temp/" + uuid)
-	os.Remove("./temp/" + uuid + ".webp")
+	os.Remove(i)
+	os.Remove(o)
 
 	return buf, nil
 }

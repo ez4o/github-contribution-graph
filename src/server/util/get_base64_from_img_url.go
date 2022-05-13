@@ -40,14 +40,8 @@ func GetImageFromUrl(c *cache.Cache, imgUrl string) (model.Image, error) {
 
 	image.MimeType = mimetype.Detect(buffer).String()
 
-	if image.MimeType == "image/gif" || image.MimeType == "video/webm" {
-		imageBytes, err = ConvertGifToWebm(buffer)
-
-		if err != nil {
-			return model.Image{}, err
-		}
-
-		image.MimeType = "video/webm"
+	if image.MimeType == "image/gif" {
+		imageBytes = CompressGif(buffer)
 	} else if image.MimeType == "image/jpeg" || image.MimeType == "image/png" || image.MimeType == "image/webp" {
 		imageBytes, err = ConvertImgToWebp(buffer)
 
