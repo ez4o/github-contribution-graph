@@ -53,14 +53,7 @@ func (s *Server) handleRender(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	imgBase64String, err := util.GetBase64FromImgUrl(s.c, params.ImgUrl)
-	if err != nil {
-		fmt.Fprintln(w, "Error while parsing image:", err.Error())
-
-		return
-	}
-
-	imgType, err := util.GetImgTypeFromBase64(imgBase64String[0])
+	image, err := util.GetImageFromUrl(s.c, params.ImgUrl)
 	if err != nil {
 		fmt.Fprintln(w, "Error while parsing image:", err.Error())
 
@@ -85,8 +78,8 @@ func (s *Server) handleRender(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, &model.TemplateData{
 		ContributionData: contributiondata,
 		Username:         username,
-		ImgType:          imgType,
-		ImgBase64String:  imgBase64String,
+		ImgType:          image.MimeType,
+		ImgBase64String:  image.Base64String,
 	})
 }
 
@@ -120,7 +113,9 @@ func (s *Server) handleSVG(w http.ResponseWriter, r *http.Request, b *rod.Browse
 		w.WriteHeader(http.StatusInternalServerError)
 
 		fmt.Fprintln(w, pre.MustText())
-	} else {
+
+		return
+	} else if page.MustHas("#svg-container") {
 		svg := page.MustElement("#svg-container")
 		svgContent := svg.MustHTML()
 
@@ -133,7 +128,15 @@ func (s *Server) handleSVG(w http.ResponseWriter, r *http.Request, b *rod.Browse
 
 		fmt.Fprintln(w, svgContent)
 		w.(http.Flusher).Flush()
+
+		return
 	}
+
+	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Cache-Control", "no-store, max-age=0")
+	w.WriteHeader(http.StatusInternalServerError)
+
+	fmt.Fprintln(w, "Error while parsing SVG.")
 }
 
 func (s *Server) Start() {
