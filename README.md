@@ -115,7 +115,11 @@ these simple steps.
 
 - [Go](https://go.dev/doc/install)
 
-- [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+- [npm](https://nodejs.org/en/download/)
+
+- [ffmpeg](https://github.com/FFmpeg/FFmpeg)
+
+- [gifsicle](https://github.com/kohler/gifsicle)
 
 ### Installation
 
