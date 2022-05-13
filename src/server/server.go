@@ -83,20 +83,33 @@ func (s *Server) handleRender(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (s *Server) sendSVG(svgContent string, w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "image/svg+xml; charset=utf-8")
+	w.Header().Set("Cache-Control", "public, max-age=600")
+	w.Header().Set("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval'")
+	w.WriteHeader(http.StatusOK)
+
+	fmt.Fprintln(w, svgContent)
+	w.(http.Flusher).Flush()
+}
+
 func (s *Server) handleSVG(w http.ResponseWriter, r *http.Request, b *rod.Browser) {
 	if svgContent, found := s.c.Get("cachedSvgContent:" + r.URL.Query().Encode()); found {
 		log.Println("SVG found in cache.")
 
-		w.Header().Set("Content-Type", "image/svg+xml; charset=utf-8")
-		w.Header().Set("Cache-Control", "public, max-age=600")
-		w.Header().Set("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval'")
-		w.WriteHeader(http.StatusOK)
-
-		fmt.Fprintln(w, svgContent.(string))
-
-		w.(http.Flusher).Flush()
-
+		s.sendSVG(svgContent.(string), w)
 		return
+	}
+
+	firstTimeRender := true
+
+	if svgContent, found := s.c.Get("cachedSvgContent:old:" + r.URL.Query().Encode()); found {
+		log.Println("SVG found in old cache.")
+
+		firstTimeRender = false
+
+		s.c.Delete("cachedSvgContent:old:" + r.URL.Query().Encode())
+		s.sendSVG(svgContent.(string), w)
 	}
 
 	log.Println("New SVG request.")
@@ -106,41 +119,42 @@ func (s *Server) handleSVG(w http.ResponseWriter, r *http.Request, b *rod.Browse
 	page.MustWaitLoad()
 
 	if page.MustHas("pre") {
-		pre := page.MustElement("pre")
+		if firstTimeRender {
+			pre := page.MustElement("pre")
 
-		w.Header().Set("Content-Type", "text/plain")
-		w.Header().Set("Cache-Control", "no-store, max-age=0")
-		w.WriteHeader(http.StatusInternalServerError)
+			w.Header().Set("Content-Type", "text/plain")
+			w.Header().Set("Cache-Control", "no-store, max-age=0")
+			w.WriteHeader(http.StatusInternalServerError)
 
-		fmt.Fprintln(w, pre.MustText())
+			fmt.Fprintln(w, pre.MustText())
+		}
 
 		return
 	} else if page.MustHas("#svg-container") {
 		svg := page.MustElement("#svg-container")
 		svgContent := svg.MustHTML()
 
-		w.Header().Set("Content-Type", "image/svg+xml; charset=utf-8")
-		w.Header().Set("Cache-Control", "public, max-age=600")
-		w.Header().Set("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval'")
-		w.WriteHeader(http.StatusOK)
+		if firstTimeRender {
+			s.sendSVG(svgContent, w)
+		}
 
 		s.c.Set("cachedSvgContent:"+r.URL.Query().Encode(), svgContent, cache.DefaultExpiration)
-
-		fmt.Fprintln(w, svgContent)
-		w.(http.Flusher).Flush()
+		s.c.Set("cachedSvgContent:old:"+r.URL.Query().Encode(), svgContent, 15778463000000000)
 
 		return
 	}
 
-	w.Header().Set("Content-Type", "text/plain")
-	w.Header().Set("Cache-Control", "no-store, max-age=0")
-	w.WriteHeader(http.StatusInternalServerError)
+	if firstTimeRender {
+		w.Header().Set("Content-Type", "text/plain")
+		w.Header().Set("Cache-Control", "no-store, max-age=0")
+		w.WriteHeader(http.StatusInternalServerError)
 
-	fmt.Fprintln(w, "Error while parsing SVG.")
+		fmt.Fprintln(w, "Error while parsing SVG.")
+	}
 }
 
 func (s *Server) Start() {
-	s.c = cache.New(30*time.Minute, 30*time.Minute)
+	s.c = cache.New(30*time.Minute, 1*time.Minute)
 
 	ssrServer := http.NewServeMux()
 	ssrServer.HandleFunc("/", s.handleRender)
@@ -153,7 +167,15 @@ func (s *Server) Start() {
 
 	svgServer := http.NewServeMux()
 	svgServer.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		s.handleSVG(w, r, browser)
+		if len(r.URL.String()) > 2 {
+			if r.URL.String()[1] == '?' {
+				s.handleSVG(w, r, browser)
+
+				return
+			}
+		}
+
+		http.NotFound(w, r)
 	})
 	http.ListenAndServe(":8686", svgServer)
 }
