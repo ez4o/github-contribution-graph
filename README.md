@@ -84,6 +84,8 @@ website.
 | `last_n_days` | Optional  | The n days to show on the chart. **0 < n < 365**                          | 7             |
 | `img_url`     | Optional  | Background image. Use url encode tool like <https://www.urlencoder.org/>. | A Cat Image   |
 
+> :warning: **If you are using large `last_n_days` or large image file**: The response time may be very long!
+
 ### Example
 
 Assume we want:
