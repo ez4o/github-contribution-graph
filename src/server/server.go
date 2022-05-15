@@ -93,23 +93,40 @@ func (s *Server) sendSVG(svgContent string, w http.ResponseWriter) {
 	w.(http.Flusher).Flush()
 }
 
+func (s *Server) handleSVGInBackground(r *http.Request, b *rod.Browser) {
+	log.Println("New SVG request in background.")
+
+	page := b.MustPage(fmt.Sprintf("http://localhost:8687/?%s", r.URL.Query().Encode()))
+	defer page.Close()
+	page.MustWaitLoad()
+
+	if page.MustHas("#svg-container") {
+		svg := page.MustElement("#svg-container")
+		svgContent := svg.MustHTML()
+
+		s.c.Set("cachedSvgContent:"+r.URL.Query().Encode(), svgContent, cache.DefaultExpiration)
+		s.c.Set("cachedSvgContent:old:"+r.URL.Query().Encode(), svgContent, 15778463000000000)
+	}
+}
+
 func (s *Server) handleSVG(w http.ResponseWriter, r *http.Request, b *rod.Browser) {
 	if svgContent, found := s.c.Get("cachedSvgContent:" + r.URL.Query().Encode()); found {
 		log.Println("SVG found in cache.")
 
 		s.sendSVG(svgContent.(string), w)
+
 		return
 	}
-
-	firstTimeRender := true
 
 	if svgContent, found := s.c.Get("cachedSvgContent:old:" + r.URL.Query().Encode()); found {
 		log.Println("SVG found in old cache.")
 
-		firstTimeRender = false
-
 		s.c.Delete("cachedSvgContent:old:" + r.URL.Query().Encode())
 		s.sendSVG(svgContent.(string), w)
+
+		go s.handleSVGInBackground(r, b)
+
+		return
 	}
 
 	log.Println("New SVG request.")
@@ -119,24 +136,20 @@ func (s *Server) handleSVG(w http.ResponseWriter, r *http.Request, b *rod.Browse
 	page.MustWaitLoad()
 
 	if page.MustHas("pre") {
-		if firstTimeRender {
-			pre := page.MustElement("pre")
+		pre := page.MustElement("pre")
 
-			w.Header().Set("Content-Type", "text/plain")
-			w.Header().Set("Cache-Control", "no-store, max-age=0")
-			w.WriteHeader(http.StatusInternalServerError)
+		w.Header().Set("Content-Type", "text/plain")
+		w.Header().Set("Cache-Control", "no-store, max-age=0")
+		w.WriteHeader(http.StatusInternalServerError)
 
-			fmt.Fprintln(w, pre.MustText())
-		}
+		fmt.Fprintln(w, pre.MustText())
 
 		return
 	} else if page.MustHas("#svg-container") {
 		svg := page.MustElement("#svg-container")
 		svgContent := svg.MustHTML()
 
-		if firstTimeRender {
-			s.sendSVG(svgContent, w)
-		}
+		s.sendSVG(svgContent, w)
 
 		s.c.Set("cachedSvgContent:"+r.URL.Query().Encode(), svgContent, cache.DefaultExpiration)
 		s.c.Set("cachedSvgContent:old:"+r.URL.Query().Encode(), svgContent, 15778463000000000)
@@ -144,13 +157,11 @@ func (s *Server) handleSVG(w http.ResponseWriter, r *http.Request, b *rod.Browse
 		return
 	}
 
-	if firstTimeRender {
-		w.Header().Set("Content-Type", "text/plain")
-		w.Header().Set("Cache-Control", "no-store, max-age=0")
-		w.WriteHeader(http.StatusInternalServerError)
+	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Cache-Control", "no-store, max-age=0")
+	w.WriteHeader(http.StatusInternalServerError)
 
-		fmt.Fprintln(w, "Error while parsing SVG.")
-	}
+	fmt.Fprintln(w, "Error while parsing SVG.")
 }
 
 func (s *Server) Start() {
