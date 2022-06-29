@@ -17,9 +17,16 @@ func GetContributionData(c *cache.Cache, id string, githubToken string, lastNDay
 	if data, found := c.Get("cahcedContributionData:" + id); found {
 		log.Println("Found contribution data in cache.")
 
+		result := data.(model.GitHubData)
+
+		t, err := result.GetContributionOfLastNDays(lastNDays)
+		if err != nil {
+			return nil, "", err
+		}
+
 		username, _ := c.Get("cahcedUsername:" + id)
 
-		return data.([]model.ContributionEntry), username.(string), nil
+		return t, username.(string), nil
 	}
 
 	var requestBody bytes.Buffer
@@ -97,7 +104,7 @@ func GetContributionData(c *cache.Cache, id string, githubToken string, lastNDay
 		username = id
 	}
 
-	c.Set("cahcedContributionData:"+id, t, cache.DefaultExpiration)
+	c.Set("cahcedContributionData:"+id, result, cache.DefaultExpiration)
 	c.Set("cahcedUsername:"+id, username, cache.DefaultExpiration)
 
 	return t, username, nil
