@@ -117,7 +117,7 @@ these simple steps.
 
 - [Go](https://go.dev/doc/install)
 
-- [npm](https://nodejs.org/en/download/)
+- [pnpm](https://pnpm.io/)
 
 - [ffmpeg](https://github.com/FFmpeg/FFmpeg)
 
@@ -135,7 +135,7 @@ these simple steps.
 2. Install npm packages.
 
    ```sh
-   npm i
+   pnpm i
    ```
 
 3. Install Go modules.
